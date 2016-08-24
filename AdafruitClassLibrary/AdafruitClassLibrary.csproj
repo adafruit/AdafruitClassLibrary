@@ -109,6 +109,7 @@
   <ItemGroup>
     <Compile Include="CharLCDPlate.cs" />
     <Compile Include="DotStar.cs" />
+    <Compile Include="GPS.cs" />
     <Compile Include="MCP23017.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\AdafruitClassLibrary.rd.xml" />

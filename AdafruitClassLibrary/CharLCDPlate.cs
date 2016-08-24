@@ -1,4 +1,29 @@
-﻿using System;
+﻿/*------------------------------------------------------------------------
+  Windows IoT library to control the Adafruit Character LCD Plate.
+
+  Written by Rick Lesniak for Adafruit Industries.
+
+  Adafruit invests time and resources providing this open source code,
+  please support Adafruit and open-source hardware by purchasing products
+  from Adafruit!
+
+  ------------------------------------------------------------------------
+  This file is part of the Adafruit Windows IoT Class Library
+
+  Adafruit CharLCDPlate is free software: you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public License
+  as published by the Free Software Foundation, either version 3 of
+  the License, or (at your option) any later version.
+
+  Adafruit CharLCDPlate is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with DotStar.  If not, see <http://www.gnu.org/licenses/>.
+  ------------------------------------------------------------------------*/
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
