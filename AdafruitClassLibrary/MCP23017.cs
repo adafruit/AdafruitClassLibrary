@@ -10,18 +10,11 @@
   ------------------------------------------------------------------------
   This file is part of the Adafruit Windows IoT Class Library
 
-  Adafruit MCP23017 is free software: you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public License
-  as published by the Free Software Foundation, either version 3 of
-  the License, or (at your option) any later version.
-
   Adafruit MCP23017 is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU Lesser General Public License for more details.
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-  You should have received a copy of the GNU Lesser General Public
-  License along with DotStar.  If not, see <http://www.gnu.org/licenses/>.
+  MIT license, all text above must be included in any redistribution.
   ------------------------------------------------------------------------*/
 
 using System;

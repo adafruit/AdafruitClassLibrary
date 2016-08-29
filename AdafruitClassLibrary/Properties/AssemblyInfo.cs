@@ -9,9 +9,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("AdafruitClassLibrary")]
 [assembly: AssemblyDescription("Library for Adafruit hardware under Windows IoT Core")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Adafruit")]
+[assembly: AssemblyCompany("Adafruit Industries")]
 [assembly: AssemblyProduct("AdafruitClassLibrary")]
-[assembly: AssemblyCopyright("GNU Lesser General Public License v3 or later")]
+[assembly: AssemblyCopyright("2016 Adafruit Industries")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
