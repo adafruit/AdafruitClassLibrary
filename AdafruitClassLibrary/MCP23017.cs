@@ -75,6 +75,11 @@ namespace AdafruitClassLibrary
             I2CAddr = MCP23017_ADDRESS;
         }
 
+        /// <summary>
+        /// InitI2C
+        /// Initialize I2C Communications
+        /// </summary>
+        /// <returns>async Task</returns>
         public async Task InitI2C()
         {
             // initialize I2C communications
@@ -92,6 +97,11 @@ namespace AdafruitClassLibrary
             }
         }
 
+        /// <summary>
+        /// InitMCP23017
+        /// Initialize MCP23017 chip
+        /// </summary>
+        /// <returns>async Task</returns>
         public async Task InitMCP23017()
         {
             byte[] writeBuffer;
@@ -108,6 +118,12 @@ namespace AdafruitClassLibrary
             Write(writeBuffer);
         }
 
+        /// <summary>
+        /// pinMode
+        /// Set pin direction, input or output
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="d"></param>
         public void pinMode(int p, Direction d)
         {
             byte[] readBuffer;
@@ -148,6 +164,12 @@ namespace AdafruitClassLibrary
             Write(writeBuffer);
         }
 
+        /// <summary>
+        /// digitalWrite
+        /// Sets the state of an output pin
+        /// </summary>
+        /// <param name="pin"></param>
+        /// <param name="d"></param>
         public void digitalWrite(int pin, Level d)
         {
             byte[] readBuffer;
@@ -192,6 +214,12 @@ namespace AdafruitClassLibrary
             Write(writeBuffer);
         }
 
+        /// <summary>
+        /// pullUp
+        /// Sets the pullup resistor on a gpio pin
+        /// </summary>
+        /// <param name="pin"></param>
+        /// <param name="d"></param>
         public void pullUp(int pin, Level d)
         {
             byte[] readBuffer;
@@ -231,6 +259,12 @@ namespace AdafruitClassLibrary
             Write(writeBuffer);
         }
 
+        /// <summary>
+        /// digitalRead
+        /// returns the input state of a gpio pin
+        /// </summary>
+        /// <param name="pin"></param>
+        /// <returns></returns>
         public int digitalRead(int pin)
         {
             byte[] readBuffer;
@@ -254,6 +288,11 @@ namespace AdafruitClassLibrary
             return (readBuffer[0] >> pin) & 0x1;
         }
 
+        /// <summary>
+        /// writeGPIOAB
+        /// writes a 16-bit value to the A and B gpio registers
+        /// </summary>
+        /// <param name="ba"></param>
         public void writeGPIOAB(UInt16 ba)
         {
             byte[] writeBuffer;
@@ -261,6 +300,11 @@ namespace AdafruitClassLibrary
             Write(writeBuffer);
         }
 
+        /// <summary>
+        /// readGPIOAB
+        /// Reads a 16-bit value from the GPIO a and B registers
+        /// </summary>
+        /// <returns>UInt16</returns>
         public UInt16 readGPIOAB()
         {
             byte[] readBuffer;
@@ -272,6 +316,12 @@ namespace AdafruitClassLibrary
 
         }
 
+        /// <summary>
+        /// WriteRead
+        /// writes to I2C and reads back the result
+        /// </summary>
+        /// <param name="writeBuffer"></param>
+        /// <param name="readBuffer"></param>
         private void WriteRead(byte[] writeBuffer, byte[] readBuffer)
         {
             try
@@ -284,6 +334,11 @@ namespace AdafruitClassLibrary
             }
         }
 
+        /// <summary>
+        /// Read
+        /// Reads an MCP23017 register
+        /// </summary>
+        /// <param name="readBuffer"></param>
         private void Read(byte[] readBuffer)
         {
             try
@@ -296,6 +351,11 @@ namespace AdafruitClassLibrary
             }
         }
 
+        /// <summary>
+        /// Write
+        /// Writes to an MCP23017 register
+        /// </summary>
+        /// <param name="writeBuffer"></param>
         private void Write(byte[] writeBuffer)
         {
             try

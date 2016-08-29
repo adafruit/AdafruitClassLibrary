@@ -173,6 +173,20 @@ namespace AdafruitClassLibrary
         }
 
         #region GPS Commands
+        /// <summary>
+        /// SetSentencesReporting: Set which sentences to report and their individual reporting frequency in fix intervals
+        ///  0: for no sentence reporting
+        ///  1: once every position fix
+        ///  2: once every two position fixes
+        ///  3..5: once every 3 to 5 position fixes
+        /// </summary>
+        /// <param name="GLLfreq"></param>
+        /// <param name="RMCfreq"></param> 
+        /// <param name="VTGfreq"></param>
+        /// <param name="GGAfreq"></param>
+        /// <param name="GSAfreq"></param>
+        /// <param name="GSVfreq"></param>
+        /// <returns>async Task</returns>
         public async Task SetSentencesReporting(int GLLfreq, int RMCfreq, int VTGfreq, int GGAfreq, int GSAfreq, int GSVfreq)
         {
             string cmdString = "PMTK314";
@@ -196,6 +210,12 @@ namespace AdafruitClassLibrary
 
         }
 
+        /// <summary>
+        /// SetUpdateFrequency
+        /// Set postion reporting frwquency in Hz
+        /// </summary>
+        /// <param name="freqHz"></param>
+        /// <returns>async Task</returns>
         public async Task SetUpdateFrequency(double freqHz)
         {
             string cmdString = "PMTK220";
@@ -212,6 +232,12 @@ namespace AdafruitClassLibrary
             await SendCommand(cmdString);
         }
 
+        /// <summary>
+        /// SetBaudRate
+        /// Set GPS UART Baud Rate
+        /// </summary>
+        /// <param name="baudrate"></param>
+        /// <returns>async Task</returns>
         public async Task SetBaudRate(uint baudrate)
         {
             string cmdString = "PMTK251";
@@ -228,7 +254,13 @@ namespace AdafruitClassLibrary
             await SendCommand(cmdString);
         }
 
-
+        /// <summary>
+        /// SetPMTKCommand
+        /// Generic send for a PMTK command.  Argument string should include leading '$', checksum, 
+        /// and trailing CR/LF
+        /// </summary>
+        /// <param name="pmtk"></param>
+        /// <returns>async Task</returns>
         public async Task SendPMTKCommand(string pmtk)
         {
             await SendCommand(pmtk);
@@ -237,6 +269,11 @@ namespace AdafruitClassLibrary
         #endregion
 
         #region Serial Control
+        /// <summary>
+        /// Connected
+        /// Predicate returns true if UART is connected
+        /// </summary>
+        /// <returns>bool</returns>
         public bool Connected
         {
             get { return SerialPort != null; }
@@ -247,6 +284,9 @@ namespace AdafruitClassLibrary
         /// - Use SerialDevice.GetDeviceSelector to find serial device named "UART0". 
         ///   This is the built-in Raspberry Pi serial port.
         /// </summary>
+        /// <param name="baudRate"></param>
+        /// <param name="uartID"></param>
+        /// <returns>async Task</returns>
         public async Task ConnectToUART(uint? baudRate = 9600, string uartID = "UART0")
         {
             if (null != baudRate)
@@ -260,7 +300,7 @@ namespace AdafruitClassLibrary
                 {
                     DeviceInformation uart = dis[0];
 
-                        SerialPort = await SerialDevice.FromIdAsync(uart.Id);
+                    SerialPort = await SerialDevice.FromIdAsync(uart.Id);
                     // Configure serial settings
                     if (null != SerialPort)
                     {
@@ -290,12 +330,20 @@ namespace AdafruitClassLibrary
             }
         }
         
+        /// <summary>
+        /// StartReading
+        /// Starts process to read PMTK sentences from UART
+        /// </summary>
         public void StartReading()
         {
             ReadCancellationTokenSource = new CancellationTokenSource();
             ReadTask = ReadAsync(ReadCancellationTokenSource.Token);
         }
 
+        /// <summary>
+        /// StopReading
+        /// Terminates PMTK reading process
+        /// </summary>
         public void StopReading()
         {
             ReadCancellationTokenSource.Cancel();
@@ -306,6 +354,10 @@ namespace AdafruitClassLibrary
             }
         }
 
+        /// <summary>
+        /// DisconnectFromUART
+        /// Disconnects from the UART
+        /// </summary>
         public void DisconnectFromUART()
         {
             StopReading();
@@ -326,6 +378,13 @@ namespace AdafruitClassLibrary
             }
         }
 
+        /// <summary>
+        /// ReadAsync
+        ///  Task to read PMTK sentences.
+        ///  Performs sentence assembly, calls parsing routine
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns>async Task</returns>
         public async Task ReadAsync(CancellationToken cancellationToken)
         {
             Task<UInt32> loadAsyncTask;
@@ -402,6 +461,12 @@ namespace AdafruitClassLibrary
             SerialPort = null;
         }
 
+        /// <summary>
+        /// SendCommand
+        /// Asynchronous task to write to GPS through UART
+        /// </summary>
+        /// <param name="cmdString"></param>
+        /// <returns>async Task</returns>
         private async Task SendCommand(string cmdString)
         {
             try
@@ -431,6 +496,12 @@ namespace AdafruitClassLibrary
         #endregion
 
         #region Parsing
+        /// <summary>
+        /// IsValid
+        /// Checks PMTK sentence, including checksum. Returns true if sentence is valid
+        /// </summary>
+        /// <param name="sentence"></param>
+        /// <returns>bool</returns>
         private bool IsValid(string sentence)
         {
             bool validSentence = false;
@@ -466,6 +537,12 @@ namespace AdafruitClassLibrary
         // GPGGA  - GPS Fix Data
         // GPGSA  - GNSS DOPS and Active Satellites
         // GPGSV  - GNSS Satellites in View
+
+        /// <summary>
+        /// DispatchSentnce
+        /// Sends sentence to a parser based on sentence type
+        /// </summary>
+        /// <param name="sentence"></param>
         private void DispatchSentence(string sentence)
         {
             if (IsValid(sentence))
@@ -504,6 +581,13 @@ namespace AdafruitClassLibrary
             }
         }
 
+        /// <summary>
+        /// CheckPMTKAck
+        /// Parses PMTK ACK sentence
+        /// </summary>
+        /// <param name="sentence"></param>
+        /// <param name="cmdNumber"></param>
+        /// <returns></returns>
         private bool CheckPMTKAck(string sentence, string cmdNumber)
         {
             bool isAck = false;
@@ -538,6 +622,11 @@ namespace AdafruitClassLibrary
             {
             }
 
+            /// <summary>
+            /// GPSRMC
+            /// Parses RMC sentence
+            /// </summary>
+            /// <param name="sentence"></param>
             public GPSRMC(string sentence)
             {
                 string[] splitString = sentence.Split(new char[] { ',', '*' });
@@ -557,8 +646,6 @@ namespace AdafruitClassLibrary
                 LatDegrees = ToDegrees(Latitude);
                 LonDegrees = ToDegrees(Longitude);
             }
-
-
         }
 
         public class GPSGGA : SentenceBase
@@ -586,6 +673,11 @@ namespace AdafruitClassLibrary
             {
             }
 
+            /// <summary>
+            /// GPSGGA
+            /// Parses GGA sentence
+            /// </summary>
+            /// <param name="sentence"></param>
             public GPSGGA(string sentence)
             {
                 string[] splitString = sentence.Split(new char[] { ',', '*' });
@@ -625,6 +717,11 @@ namespace AdafruitClassLibrary
             {
             }
 
+            /// <summary>
+            /// GPSGLL
+            /// Parses GLL sentence
+            /// </summary>
+            /// <param name="sentence"></param>
             public GPSGLL(string sentence)
             {
                 string[] splitString = sentence.Split(new char[] { ',', '*' });
@@ -651,11 +748,17 @@ namespace AdafruitClassLibrary
             public string SKn { get; set; }
             public double? SpeedKm { get; set; }
             public string SKm { get; set; }
+            public string Mode { get; set; }
 
             public GPSVTG()
             {
             }
 
+            /// <summary>
+            /// GPSVTG
+            /// Parses VTG sentence
+            /// </summary>
+            /// <param name="sentence"></param>
             public GPSVTG(string sentence)
             {
                 string[] splitString = sentence.Split(new char[] { ',', '*' });
@@ -668,6 +771,7 @@ namespace AdafruitClassLibrary
                 SKn = splitString[5];                       // "N"
                 SpeedKm = ParseDouble(splitString[6]);      // Speed in km/h
                 SKm = splitString[7];                       // "K"
+                Mode = splitString[8];
             }
         }
 
@@ -686,6 +790,11 @@ namespace AdafruitClassLibrary
             {
             }
 
+            /// <summary>
+            /// GPSGSA
+            /// Parses GSA sentence
+            /// </summary>
+            /// <param name="sentence"></param>
             public GPSGSA(string sentence)
             {
                 string[] splitString = sentence.Split(new char[] { ',', '*' });
@@ -722,6 +831,11 @@ namespace AdafruitClassLibrary
             {
             }
 
+            /// <summary>
+            /// GPSGSV
+            /// Parses GSV sentence
+            /// </summary>
+            /// <param name="sentence"></param>
             public GPSGSV(string sentence)
             {
                 string[] splitString = sentence.Split(new char[] { ',', '*' });
@@ -798,6 +912,12 @@ namespace AdafruitClassLibrary
                 return stamp;
             }
 
+            /// <summary>
+            /// ToDegrees
+            /// Converts dddmm.mmmm lat/long format to decimal degrees
+            /// </summary>
+            /// <param name="latlong"></param>
+            /// <returns></returns>
             protected double? ToDegrees(double? latlong)
             {
                 double? degrees = null;

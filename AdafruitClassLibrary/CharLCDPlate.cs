@@ -105,6 +105,9 @@ namespace AdafruitClassLibrary
         //                    VIOLET = 0x5,
         //                    WHITE = 0x07 };
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public CharLCDPlate()
         {
             MCP = new MCP23017();
@@ -120,6 +123,14 @@ namespace AdafruitClassLibrary
             ColorPins = new List<byte>() { 6, 7, 8 };  //red, green, blue
         }
 
+        /// <summary>
+        /// Begin
+        /// Initializes the Character LCD and MCP23017
+        /// </summary>
+        /// <param name="cols"></param>
+        /// <param name="lines"></param>
+        /// <param name="dotsize"></param>
+        /// <returns></returns>
         public async Task Begin(int cols, int lines, int dotsize = LCD_5x8DOTS)
         {
             await MCP.InitMCP23017();
@@ -222,18 +233,32 @@ namespace AdafruitClassLibrary
 
         }
 
+        /// <summary>
+        /// clear
+        /// Clears the LCD display
+        /// </summary>
         public void clear()
         {
             command(LCD_CLEARDISPLAY);  // clear display, set cursor position to zero
             usDelay(2000);
         }
 
+        /// <summary>
+        /// home
+        /// set curson postion to 0,0
+        /// </summary>
         public void home()
         {
             command(LCD_RETURNHOME);  // set cursor position to zero
             usDelay(2000);
         }
 
+        /// <summary>
+        /// setCursor
+        /// Sets cursor position
+        /// </summary>
+        /// <param name="col"></param>
+        /// <param name="line"></param>
         public void setCursor(byte col, byte line)
         {
             byte[] row_offsets = { 0x00, 0x40, 0x14, 0x54 };
@@ -246,78 +271,118 @@ namespace AdafruitClassLibrary
             command((byte)(LCD_SETDDRAMADDR | (col + row_offsets[line])));
         }
 
-        // Turn the display on/off (quickly)
+        /// <summary>
+        /// noDisplay
+        /// Turn the display off (quickly)
+        /// </summary>
         public void noDisplay()
         {
             unchecked { DisplayControl &= (byte)(~LCD_DISPLAYON); }
             command((byte)(LCDDisplayControl | DisplayControl));
         }
 
+        /// <summary>
+        /// display
+        /// Turn the display on (quickly)
+        /// </summary>
         public void display()
         {
             DisplayControl |= LCD_DISPLAYON;
             command((byte)(LCDDisplayControl | DisplayControl));
         }
 
-        // Turns the underline cursor on/off
+        /// <summary>
+        /// noCursor
+        /// Turns the underline cursor ooff
+        /// </summary>
         public void noCursor()
         {
             unchecked { DisplayControl &= (byte)~LCD_CURSORON; }
             command((byte)(LCDDisplayControl | DisplayControl));
         }
 
+        /// <summary>
+        /// cursor
+        ///  Turns the underline cursor on
+        /// </summary>
         public void cursor()
         {
             DisplayControl |= LCD_CURSORON;
             command((byte)(LCDDisplayControl | DisplayControl));
         }
 
-        // Turn on and off the blinking cursor
+        /// <summary>
+        /// noBLink
+        /// Turn off the blinking cursor
+        /// </summary>
         public void noBlink()
         {
             unchecked { DisplayControl &= (byte)~LCD_BLINKON; }
             command((byte)(LCDDisplayControl | DisplayControl));
         }
 
+        /// <summary>
+        /// blink
+        /// Turn on the blinking cursor
+        /// </summary>
         public void blink()
         {
             DisplayControl |= LCD_BLINKON;
             command((byte)(LCDDisplayControl | DisplayControl));
         }
 
-        // These commands scroll the display without changing the RAM
+        /// <summary>
+        /// scrollDisplayLeft
+        /// scroll the display left without changing the RAM
+        /// </summary>
         public void scrollDisplayLeft()
         {
             command((byte)(LCD_CURSORSHIFT | LCD_DISPLAYMOVE | LCD_MOVELEFT));
         }
 
+        /// <summary>
+        /// scrollDisplayRight
+        /// scroll the display right without changing the RAM
+        /// </summary>
         public void scrollDisplayRight()
         {
             command((byte)(LCD_CURSORSHIFT | LCD_DISPLAYMOVE | LCD_MOVERIGHT));
         }
 
-        // This is for text that flows Left to Right
+        /// <summary>
+        /// leftToRight
+        /// set text to flow Left to Right
+        /// </summary>
         public void leftToRight()
         {
             DisplayMode |= LCD_ENTRYLEFT;
             command((byte)(LCD_ENTRYMODESET | DisplayMode));
         }
 
-        // This is for text that flows Right to Left
+        /// <summary>
+        /// rightToLeft
+        ///  set text to flow Right to Left
+        /// </summary>
         public void rightToLeft()
         {
             unchecked { DisplayMode &= (byte)~LCD_ENTRYLEFT; }
             command((byte)(LCD_ENTRYMODESET | DisplayMode));
         }
 
-        // This will 'right justify' text from the cursor
+        /// <summary>
+        /// autoscroll
+        /// 'right justify' text from the cursor
+        /// </summary>
         public void autoscroll()
         {
             DisplayMode |= LCD_ENTRYSHIFTINCREMENT;
             command((byte)(LCD_ENTRYMODESET | DisplayMode));
         }
 
-        // This will 'left justify' text from the cursor
+        /// <summary>
+        /// noAutoscroll
+        /// 'left justify' text from the cursor
+        /// </summary>
         public void noAutoscroll()
         {
             unchecked { DisplayMode &= (byte)~LCD_ENTRYSHIFTINCREMENT; }
@@ -326,6 +391,13 @@ namespace AdafruitClassLibrary
 
         // Allows us to fill the first 8 CGRAM locations
         // with custom characters
+        /// <summary>
+        /// createChar
+        /// Allows you to fill the first 8 CGRAM locations
+        /// with custom characters
+        /// </summary>
+        /// <param name="location"></param>
+        /// <param name="charmap"></param>
         public void createChar(byte location, byte[] charmap)
         {
             location &= 0x7; // we only have 8 locations 0-7
@@ -337,6 +409,12 @@ namespace AdafruitClassLibrary
             command(LCD_SETDDRAMADDR);  // unfortunately resets the location to 0,0
         }
 
+        /// <summary>
+        /// readButtons
+        /// read the state of the 5 buttons on the plate
+        /// returns bitmap
+        /// </summary>
+        /// <returns>byte</returns>
         public byte readButtons()
         {
             byte reply = 0x1F;
@@ -348,14 +426,24 @@ namespace AdafruitClassLibrary
             return reply;
         }
 
+        /// <summary>
+        /// setBacklight
+        /// set RGB colors for the backlight
+        /// bitmap R=4, G=2, B=1
+        /// </summary>
+        /// <param name="color"></param>
         public void setBacklight(int color)
         {
-            // check if i2c or SPI
             MCP.digitalWrite(8, (MCP23017.Level)(~(color >> 2) & 0x1));
             MCP.digitalWrite(7, (MCP23017.Level)(~(color >> 1) & 0x1));
             MCP.digitalWrite(6, (MCP23017.Level)(~color & 0x1));
         }
 
+        /// <summary>
+        /// print overload.
+        /// print a string starting at cursor
+        /// </summary>
+        /// <param name="str"></param>
         public void print(string str)
         {
             foreach (char c in str)
@@ -371,11 +459,21 @@ namespace AdafruitClassLibrary
             }
         }
 
+        /// <summary>
+        /// print overload
+        /// print an integer starting at the cursor
+        /// </summary>
+        /// <param name="number"></param>
         public void print(int number)
         {
             print(number.ToString());
         }
 
+        /// <summary>
+        /// print overload
+        /// print a double starting at the cursor
+        /// </summary>
+        /// <param name="number"></param>
         public void print(double number)
         {
             print(number.ToString());
@@ -440,6 +538,11 @@ namespace AdafruitClassLibrary
 
         #endregion
 
+        /// <summary>
+        /// usDelay
+        /// function with delay argument in microseconds
+        /// </summary>
+        /// <param name="duration"></param>
         private void usDelay(long duration)
         {
             // Static method to initialize and start stopwatch
