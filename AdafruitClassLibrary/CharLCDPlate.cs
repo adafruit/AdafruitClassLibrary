@@ -62,8 +62,8 @@ namespace AdafruitClassLibrary
         private const byte LCD_4BITMODE = 0x00;
         private const byte LCD_2LINE = 0x08;
         private const byte LCD_1LINE = 0x00;
-        private const byte LCD_5x10DOTS = 0x04;
-        private const byte LCD_5x8DOTS = 0x00;
+        public const byte LCD_5x10DOTS = 0x04;
+        public const byte LCD_5x8DOTS = 0x00;
 
         public const byte BUTTON_UP = 0x08;
         public const byte BUTTON_DOWN = 0x04;
@@ -131,9 +131,9 @@ namespace AdafruitClassLibrary
         /// <param name="lines"></param>
         /// <param name="dotsize"></param>
         /// <returns></returns>
-        public async Task Begin(int cols, int lines, int dotsize = LCD_5x8DOTS)
+        public async Task BeginAsync(int cols, int lines, int dotsize = LCD_5x8DOTS)
         {
-            await MCP.InitMCP23017();
+            await MCP.InitMCP23017Async();
 
             MCP.pinMode(RWPin, MCP23017.Direction.OUTPUT);
             MCP.pinMode(RSPin, MCP23017.Direction.OUTPUT);
@@ -421,7 +421,7 @@ namespace AdafruitClassLibrary
 
             for (byte i = 0; i < 5; i++)
             {
-                reply &= (byte)~((MCP.digitalRead(ButtonPins[i])) << i);
+                reply &= (byte)~((byte)(MCP.digitalRead(ButtonPins[i])) << i);
             }
             return reply;
         }
@@ -480,7 +480,7 @@ namespace AdafruitClassLibrary
         }
 
         #region  mid level commands
-        public void command(byte value)
+        private void command(byte value)
         {
             send(value, MCP23017.Level.LOW);
         }

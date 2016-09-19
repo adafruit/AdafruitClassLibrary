@@ -80,7 +80,7 @@ namespace AdafruitClassLibrary
         /// Initialize I2C Communications
         /// </summary>
         /// <returns>async Task</returns>
-        public async Task InitI2C()
+        private async Task InitI2CAsync()
         {
             // initialize I2C communications
             try
@@ -102,18 +102,18 @@ namespace AdafruitClassLibrary
         /// Initialize MCP23017 chip
         /// </summary>
         /// <returns>async Task</returns>
-        public async Task InitMCP23017()
+        public async Task InitMCP23017Async()
         {
             byte[] writeBuffer;
 
-            await InitI2C();
+            await InitI2CAsync();
 
             // set defaults!
-            // all inputs on Port A
+            // all outputs on Port A
             writeBuffer = new byte[] { MCP23017_IODIRA, 0xFF };
             Write(writeBuffer);
 
-            // all inputs on Port B
+            // all outputs on Port B
             writeBuffer = new byte[] { MCP23017_IODIRB, 0xFF };
             Write(writeBuffer);
         }
@@ -264,8 +264,8 @@ namespace AdafruitClassLibrary
         /// returns the input state of a gpio pin
         /// </summary>
         /// <param name="pin"></param>
-        /// <returns></returns>
-        public int digitalRead(int pin)
+        /// <returns>Level</returns>
+        public Level digitalRead(int pin)
         {
             byte[] readBuffer;
             byte registerAddr;
@@ -285,7 +285,7 @@ namespace AdafruitClassLibrary
             // read the current GPIO
             readBuffer = new byte[1];
             WriteRead(new byte[] { registerAddr }, readBuffer);
-            return (readBuffer[0] >> pin) & 0x1;
+            return ((readBuffer[0] >> pin) & 0x1) == 0 ? Level.LOW : Level.HIGH;
         }
 
         /// <summary>

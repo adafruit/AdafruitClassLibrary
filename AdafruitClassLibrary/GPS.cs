@@ -47,7 +47,7 @@ namespace AdafruitClassLibrary
         private GPSGSA m_GSA = new GPSGSA();
         private GPSGSV m_GSV = new GPSGSV();
 
-        public GPSRMC RMC
+        private GPSRMC RMC
         {
             get
             {
@@ -65,7 +65,7 @@ namespace AdafruitClassLibrary
             }
         }
 
-        public GPSGGA GGA
+        private GPSGGA GGA
         {
             get
             {
@@ -83,7 +83,7 @@ namespace AdafruitClassLibrary
             }
         }
 
-        public GPSGLL GLL
+        private GPSGLL GLL
         {
             get
             {
@@ -101,7 +101,7 @@ namespace AdafruitClassLibrary
             }
         }
 
-        public GPSVTG VTG
+        private GPSVTG VTG
         {
             get
             {
@@ -119,7 +119,7 @@ namespace AdafruitClassLibrary
             }
         }
 
-        public GPSGSA GSA
+        private GPSGSA GSA
         {
             get
             {
@@ -137,7 +137,7 @@ namespace AdafruitClassLibrary
             }
         }
 
-        public GPSGSV GSV
+        private GPSGSV GSV
         {
             get
             {
@@ -164,6 +164,7 @@ namespace AdafruitClassLibrary
             SerialPort = null;
             DataWriterObject = null;
             DataReaderObject = null;
+            ReadTask = null;
             GLLEvent += (o, e) => { };
             RMCEvent += (o, e) => { };
             VTGEvent += (o, e) => { };
@@ -187,7 +188,7 @@ namespace AdafruitClassLibrary
         /// <param name="GSAfreq"></param>
         /// <param name="GSVfreq"></param>
         /// <returns>async Task</returns>
-        public async Task SetSentencesReporting(int GLLfreq, int RMCfreq, int VTGfreq, int GGAfreq, int GSAfreq, int GSVfreq)
+        public async Task SetSentencesReportingAsync(int GLLfreq, int RMCfreq, int VTGfreq, int GGAfreq, int GSAfreq, int GSVfreq)
         {
             string cmdString = "PMTK314";
             cmdString = string.Concat(string.Concat(cmdString, ","), Math.Min(5, GLLfreq).ToString());
@@ -206,7 +207,7 @@ namespace AdafruitClassLibrary
             cmdString = string.Concat(cmdString, checksum.ToString("X2"));
             cmdString = string.Concat(cmdString, "\r\n");
 
-            await SendCommand(cmdString);
+            await SendCommandAsync(cmdString);
 
         }
 
@@ -216,7 +217,7 @@ namespace AdafruitClassLibrary
         /// </summary>
         /// <param name="freqHz"></param>
         /// <returns>async Task</returns>
-        public async Task SetUpdateFrequency(double freqHz)
+        public async Task SetUpdateFrequencyAsync(double freqHz)
         {
             string cmdString = "PMTK220";
             cmdString = string.Concat(string.Concat(cmdString, ","), (1000 / freqHz).ToString());
@@ -229,7 +230,7 @@ namespace AdafruitClassLibrary
             cmdString = string.Concat(cmdString, checksum.ToString("X2"));
             cmdString = string.Concat(cmdString, "\r\n");
 
-            await SendCommand(cmdString);
+            await SendCommandAsync(cmdString);
         }
 
         /// <summary>
@@ -238,7 +239,7 @@ namespace AdafruitClassLibrary
         /// </summary>
         /// <param name="baudrate"></param>
         /// <returns>async Task</returns>
-        public async Task SetBaudRate(uint baudrate)
+        public async Task SetBaudRateAsync(uint baudrate)
         {
             string cmdString = "PMTK251";
             cmdString = string.Concat(string.Concat(cmdString, ","),baudrate.ToString());
@@ -251,7 +252,7 @@ namespace AdafruitClassLibrary
             cmdString = string.Concat(cmdString, checksum.ToString("X2"));
             cmdString = string.Concat(cmdString, "\r\n");
 
-            await SendCommand(cmdString);
+            await SendCommandAsync(cmdString);
         }
 
         /// <summary>
@@ -261,9 +262,9 @@ namespace AdafruitClassLibrary
         /// </summary>
         /// <param name="pmtk"></param>
         /// <returns>async Task</returns>
-        public async Task SendPMTKCommand(string pmtk)
+        public async Task SendPMTKCommandAsync(string pmtk)
         {
-            await SendCommand(pmtk);
+            await SendCommandAsync(pmtk);
         }
 
         #endregion
@@ -287,10 +288,9 @@ namespace AdafruitClassLibrary
         /// <param name="baudRate"></param>
         /// <param name="uartID"></param>
         /// <returns>async Task</returns>
-        public async Task ConnectToUART(uint? baudRate = 9600, string uartID = "UART0")
+        public async Task ConnectToUARTAsync(uint baudRate = 9600, string uartID = "UART0")
         {
-            if (null != baudRate)
-                BaudRate = (uint)baudRate;
+            BaudRate = (uint)baudRate;
             try
             {
                 string aqs = SerialDevice.GetDeviceSelector(uartID);
@@ -332,17 +332,20 @@ namespace AdafruitClassLibrary
         
         /// <summary>
         /// StartReading
-        /// Starts process to read PMTK sentences from UART
+        /// Starts process to read NMEA sentences from UART
         /// </summary>
         public void StartReading()
         {
-            ReadCancellationTokenSource = new CancellationTokenSource();
-            ReadTask = ReadAsync(ReadCancellationTokenSource.Token);
+            if (null == ReadTask)
+            {
+                ReadCancellationTokenSource = new CancellationTokenSource();
+                ReadTask = ReadAsync(ReadCancellationTokenSource.Token);
+            }
         }
 
         /// <summary>
         /// StopReading
-        /// Terminates PMTK reading process
+        /// Terminates NMEA reading process
         /// </summary>
         public void StopReading()
         {
@@ -385,7 +388,7 @@ namespace AdafruitClassLibrary
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <returns>async Task</returns>
-        public async Task ReadAsync(CancellationToken cancellationToken)
+        private async Task ReadAsync(CancellationToken cancellationToken)
         {
             Task<UInt32> loadAsyncTask;
 
@@ -467,7 +470,7 @@ namespace AdafruitClassLibrary
         /// </summary>
         /// <param name="cmdString"></param>
         /// <returns>async Task</returns>
-        private async Task SendCommand(string cmdString)
+        private async Task SendCommandAsync(string cmdString)
         {
             try
             {

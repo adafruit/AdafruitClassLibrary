@@ -91,10 +91,10 @@ namespace AdafruitClassLibrary
             HW_SPI = (dataPin == 255);
         }
 
-        public async Task Begin()
+        public async Task BeginAsync()
         {
             if (HW_SPI)
-                await hw_spi_init();
+                await hw_spi_initAsync();
             else
                 sw_spi_init();
 
@@ -158,7 +158,7 @@ namespace AdafruitClassLibrary
         #endregion
 
         #region Hardware Spi
-        private async Task hw_spi_init()
+        private async Task hw_spi_initAsync()
         {
             // Get a selector string for bus "SPI0"
             string aqs = SpiDevice.GetDeviceSelector("SPI0");
@@ -211,8 +211,8 @@ namespace AdafruitClassLibrary
             }
         }
 
-        // Set pixel color, separate R,G,B,W values (0-255 ea.)
-        public void SetPixelColor(int pixel, byte r, byte g, byte b /*, byte w = 0 */)
+        // Set pixel color, separate R,G,B values (0-255 ea.)
+        public void SetPixelColor(int pixel, byte r, byte g, byte b)
         {
             if ((pixel >= 0) && (pixel < NumPixels))
             {
@@ -245,7 +245,7 @@ namespace AdafruitClassLibrary
         }
 
         // Convert separate R,G,B to packed value
-        public UInt32 Color(uint r, uint g, uint b /*, uint w = 0*/)
+        public UInt32 Color(uint r, uint g, uint b)
         {
             byte[] colors = { 0xFF, 0, 0, 0 };
             colors[ROffset] = (byte)r;
