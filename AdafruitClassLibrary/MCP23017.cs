@@ -28,12 +28,11 @@ using Windows.Devices.Gpio;
 
 namespace AdafruitClassLibrary
 {
-    public class MCP23017
+    class MCP23017 : I2CBase
     {
+        #region Constants
         //default I2C address
         const int MCP23017_ADDRESS = 0x20;
-
-        public enum I2CSpeed { NORMAL, FAST };
 
         // port A registers
         const byte MCP23017_IODIRA = 0x00;
@@ -61,55 +60,24 @@ namespace AdafruitClassLibrary
         const byte MCP23017_GPIOB = 0x13;
         const byte MCP23017_OLATB = 0x15;
 
-        private int I2CAddr { get; set; }
-        private I2cDevice PortExpander { get; set; }
-
         public enum Direction { INPUT = 0, OUTPUT = 1 };
         public enum Level { LOW = 0, HIGH = 1 };
+        #endregion
 
-        public MCP23017(int addr)
+        #region Constructor
+        public MCP23017(int addr = MCP23017_ADDRESS) :base(addr)
         {
-            I2CAddr = addr;
         }
+        #endregion
 
-        public MCP23017()
-        {
-            I2CAddr = MCP23017_ADDRESS;
-        }
-
-        /// <summary>
-        /// InitI2C
-        /// Initialize I2C Communications
-        /// </summary>
-        /// <returns>async Task</returns>
-        private async Task InitI2CAsync(I2CSpeed i2cSpeed = I2CSpeed.NORMAL)
-        {
-            // initialize I2C communications
-            try
-            {
-                I2cConnectionSettings i2cSettings = new I2cConnectionSettings(I2CAddr);
-                if (i2cSpeed == I2CSpeed.FAST)
-                    i2cSettings.BusSpeed = I2cBusSpeed.FastMode;
-                else
-                    i2cSettings.BusSpeed = I2cBusSpeed.StandardMode;
-
-                string deviceSelector = I2cDevice.GetDeviceSelector();
-                var i2cDeviceControllers = await DeviceInformation.FindAllAsync(deviceSelector);
-                PortExpander = await I2cDevice.FromIdAsync(i2cDeviceControllers[0].Id, i2cSettings);
-            }
-            catch (Exception e)
-            {
-                System.Diagnostics.Debug.WriteLine("Exception: {0}", e.Message);
-                return;
-            }
-        }
+        #region Initialization
 
         /// <summary>
         /// InitMCP23017
         /// Initialize MCP23017 chip
         /// </summary>
         /// <returns>async Task</returns>
-        public async Task InitMCP23017Async(I2CSpeed i2cSpeed = I2CSpeed.NORMAL)
+        public async Task InitMCP23017Async(I2CSpeed i2cSpeed = I2CSpeed.I2C_100kHz)
         {
             byte[] writeBuffer;
 
@@ -124,7 +92,9 @@ namespace AdafruitClassLibrary
             writeBuffer = new byte[] { MCP23017_IODIRB, 0xFF };
             Write(writeBuffer);
         }
+        #endregion
 
+        #region Operations
         /// <summary>
         /// pinMode
         /// Set pin direction, input or output
@@ -201,24 +171,27 @@ namespace AdafruitClassLibrary
                 pin -= 8;
             }
 
-            // read the current GPIO output latches
-            readBuffer = new byte[1];
-            WriteRead(new byte[] { olatAddr }, readBuffer);
-            pinRegister = readBuffer[0];
-
-            // set the pin and direction
-            if (d == Level.HIGH)
+            lock (Device)
             {
-                pinRegister |= (byte)(1 << pin);
-            }
-            else
-            {
-                pinRegister &= (byte) ~(1 << pin);
-            }
+                // read the current GPIO output latches
+                readBuffer = new byte[1];
+                WriteRead(new byte[] { olatAddr }, readBuffer);
+                pinRegister = readBuffer[0];
 
-            // write the new GPIO
-            writeBuffer = new byte[] { registerAddr, pinRegister };
-            Write(writeBuffer);
+                // set the pin and direction
+                if (d == Level.HIGH)
+                {
+                    pinRegister |= (byte)(1 << pin);
+                }
+                else
+                {
+                    pinRegister &= (byte)~(1 << pin);
+                }
+
+                // write the new GPIO
+                writeBuffer = new byte[] { registerAddr, pinRegister };
+                Write(writeBuffer);
+            }
         }
 
         /// <summary>
@@ -246,24 +219,27 @@ namespace AdafruitClassLibrary
                 pin -= 8;
             }
 
-            // read the current pullup register set
-            readBuffer = new byte[1];
-            WriteRead(new byte[] {pullupAddr }, readBuffer);
-            pullupRegister = readBuffer[0];
-
-            // set the pin and direction
-            if (d == Level.HIGH)
+            lock (Device)
             {
-                pullupRegister |= (byte)(1 << pin);
-            }
-            else
-            {
-                pullupRegister &= (byte) ~(1 << pin);
-            }
+                // read the current pullup register set
+                readBuffer = new byte[1];
+                WriteRead(new byte[] { pullupAddr }, readBuffer);
+                pullupRegister = readBuffer[0];
 
-            // write the new pullup
-            writeBuffer = new byte[] { pullupAddr, pullupRegister };
-            Write(writeBuffer);
+                // set the pin and direction
+                if (d == Level.HIGH)
+                {
+                    pullupRegister |= (byte)(1 << pin);
+                }
+                else
+                {
+                    pullupRegister &= (byte)~(1 << pin);
+                }
+
+                // write the new pullup
+                writeBuffer = new byte[] { pullupAddr, pullupRegister };
+                Write(writeBuffer);
+            }
         }
 
         /// <summary>
@@ -322,58 +298,6 @@ namespace AdafruitClassLibrary
             return (UInt16)((readBuffer[1] << 8)  | readBuffer[0]);
 
         }
-
-        /// <summary>
-        /// WriteRead
-        /// writes to I2C and reads back the result
-        /// </summary>
-        /// <param name="writeBuffer"></param>
-        /// <param name="readBuffer"></param>
-        private void WriteRead(byte[] writeBuffer, byte[] readBuffer)
-        {
-            try
-            {
-                PortExpander.WriteRead(writeBuffer, readBuffer);
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("I2C WriteRead Exception: {0}", ex.Message);
-            }
-        }
-
-        /// <summary>
-        /// Read
-        /// Reads an MCP23017 register
-        /// </summary>
-        /// <param name="readBuffer"></param>
-        private void Read(byte[] readBuffer)
-        {
-            try
-            {
-                PortExpander.Read(readBuffer);
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("I2C Read Exception: {0}", ex.Message);
-            }
-        }
-
-        /// <summary>
-        /// Write
-        /// Writes to an MCP23017 register
-        /// </summary>
-        /// <param name="writeBuffer"></param>
-        private void Write(byte[] writeBuffer)
-        {
-            try
-            {
-                PortExpander.Write(writeBuffer);
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("I2C Write Exception: {0}", ex.Message);
-            }
-        }
-
+        #endregion
     }
 }
