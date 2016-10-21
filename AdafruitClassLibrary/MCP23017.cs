@@ -33,6 +33,8 @@ namespace AdafruitClassLibrary
         //default I2C address
         const int MCP23017_ADDRESS = 0x20;
 
+        public enum I2CSpeed { NORMAL, FAST };
+
         // port A registers
         const byte MCP23017_IODIRA = 0x00;
         const byte MCP23017_IPOLA = 0x02;
@@ -80,12 +82,17 @@ namespace AdafruitClassLibrary
         /// Initialize I2C Communications
         /// </summary>
         /// <returns>async Task</returns>
-        private async Task InitI2CAsync()
+        private async Task InitI2CAsync(I2CSpeed i2cSpeed = I2CSpeed.NORMAL)
         {
             // initialize I2C communications
             try
             {
                 I2cConnectionSettings i2cSettings = new I2cConnectionSettings(I2CAddr);
+                if (i2cSpeed == I2CSpeed.FAST)
+                    i2cSettings.BusSpeed = I2cBusSpeed.FastMode;
+                else
+                    i2cSettings.BusSpeed = I2cBusSpeed.StandardMode;
+
                 string deviceSelector = I2cDevice.GetDeviceSelector();
                 var i2cDeviceControllers = await DeviceInformation.FindAllAsync(deviceSelector);
                 PortExpander = await I2cDevice.FromIdAsync(i2cDeviceControllers[0].Id, i2cSettings);
@@ -102,11 +109,11 @@ namespace AdafruitClassLibrary
         /// Initialize MCP23017 chip
         /// </summary>
         /// <returns>async Task</returns>
-        public async Task InitMCP23017Async()
+        public async Task InitMCP23017Async(I2CSpeed i2cSpeed = I2CSpeed.NORMAL)
         {
             byte[] writeBuffer;
 
-            await InitI2CAsync();
+            await InitI2CAsync(i2cSpeed);
 
             // set defaults!
             // all outputs on Port A
