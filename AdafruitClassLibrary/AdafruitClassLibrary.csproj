@@ -113,6 +113,7 @@
     <Compile Include="GPS.cs" />
     <Compile Include="I2CBase.cs" />
     <Compile Include="MCP23017.cs" />
+    <Compile Include="MotorHat.cs" />
     <Compile Include="PCA9685.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\AdafruitClassLibrary.rd.xml" />

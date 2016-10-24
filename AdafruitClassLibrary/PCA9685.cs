@@ -9,7 +9,7 @@ using Windows.Devices.I2c;
 
 namespace AdafruitClassLibrary
 {
-    class PCA9685 : I2CBase
+    public class PCA9685 : I2CBase
     {
         #region Constants
         const byte PCA9685_ADDRESS = 0x40;
@@ -52,9 +52,18 @@ namespace AdafruitClassLibrary
         /// <returns>async Task</returns>
         public async Task InitPCA9685Async(I2CSpeed i2cSpeed = I2CSpeed.I2C_100kHz)
         {
-            await InitI2CAsync(i2cSpeed);
+            try
+            {
+                await InitI2CAsync(i2cSpeed);
 
-            Reset();
+                Reset();
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine("Exception: {0}", e.Message);
+                return;
+            }
+
         }
 
         /// <summary>

@@ -28,7 +28,7 @@ using Windows.Devices.Gpio;
 
 namespace AdafruitClassLibrary
 {
-    class MCP23017 : I2CBase
+    public class MCP23017 : I2CBase
     {
         #region Constants
         //default I2C address

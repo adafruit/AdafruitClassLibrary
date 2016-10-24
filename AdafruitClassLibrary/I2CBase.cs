@@ -8,7 +8,7 @@ using Windows.Devices.I2c;
 
 namespace AdafruitClassLibrary
 {
-    class I2CBase
+    public class I2CBase
     {
         public enum I2CSpeed { I2C_100kHz, I2C_400kHz };
 
@@ -30,7 +30,7 @@ namespace AdafruitClassLibrary
         /// Initialize I2C Communications
         /// </summary>
         /// <returns>async Task</returns>
-        protected async Task InitI2CAsync(I2CSpeed i2cSpeed = I2CSpeed.I2C_100kHz)
+        public async Task InitI2CAsync(I2CSpeed i2cSpeed = I2CSpeed.I2C_100kHz)
         {
             // initialize I2C communications
             try
