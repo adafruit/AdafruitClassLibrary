@@ -1,5 +1,5 @@
 ﻿/*------------------------------------------------------------------------
-  Windows IoT library to control the MCP23017 I2C expander chip.
+  Adafruit Class Library for Windows Core IoT: MCP23017 I2C expander chip.
 
   Written by Rick Lesniak for Adafruit Industries.
 
@@ -10,7 +10,7 @@
   ------------------------------------------------------------------------
   This file is part of the Adafruit Windows IoT Class Library
 
-  Adafruit MCP23017 is distributed in the hope that it will be useful,
+  Adafruit Class Library is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 

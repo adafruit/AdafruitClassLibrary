@@ -108,6 +108,7 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BNO055.cs" />
     <Compile Include="CharLCDPlate.cs" />
     <Compile Include="DotStar.cs" />
     <Compile Include="GPS.cs" />

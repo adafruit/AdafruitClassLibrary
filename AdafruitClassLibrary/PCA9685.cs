@@ -1,4 +1,23 @@
-﻿using System;
+﻿/*------------------------------------------------------------------------
+  Adafruit Class Library for Windows Core IoT: PCA968 PWM chip.
+
+  Written by Rick Lesniak for Adafruit Industries.
+
+  Adafruit invests time and resources providing this open source code,
+  please support Adafruit and open-source hardware by purchasing products
+  from Adafruit!
+
+  ------------------------------------------------------------------------
+  This file is part of the Adafruit Windows IoT Class Library
+
+  Adafruit Class Library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+  MIT license, all text above must be included in any redistribution.
+  ------------------------------------------------------------------------*/
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -77,6 +96,7 @@ namespace AdafruitClassLibrary
             // all outputs on Port A
             writeBuffer = new byte[] { PCA9685_MODE1, 0x0 };
             Write(writeBuffer);
+            SetPWMFrequency(1000);  //default frequency
         }
         #endregion
 
