@@ -18,57 +18,58 @@
   ------------------------------------------------------------------------*/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Windows.Devices.Enumeration;
-using Windows.Devices.I2c;
-using Windows.Devices.Gpio;
 
 namespace AdafruitClassLibrary
 {
-    public class MCP23017 : I2CBase
+    public class Mcp23017 : I2CBase
     {
         #region Constants
+
         //default I2C address
-        const int MCP23017_ADDRESS = 0x20;
+        private const int MCP23017_ADDRESS = 0x20;
 
         // port A registers
-        const byte MCP23017_IODIRA = 0x00;
-        const byte MCP23017_IPOLA = 0x02;
-        const byte MCP23017_GPINTENA = 0x04;
-        const byte MCP23017_DEFVALA = 0x06;
-        const byte MCP23017_INTCONA = 0x08;
-        const byte MCP23017_IOCONA = 0x0A;
-        const byte MCP23017_GPPUA = 0x0C;
-        const byte MCP23017_INTFA = 0x0E;
-        const byte MCP23017_INTCAPA = 0x10;
-        const byte MCP23017_GPIOA = 0x12;
-        const byte MCP23017_OLATA = 0x14;
+        private const byte MCP23017_IODIRA = 0x00;
+
+        private const byte MCP23017_IPOLA = 0x02;
+        private const byte MCP23017_GPINTENA = 0x04;
+        private const byte MCP23017_DEFVALA = 0x06;
+        private const byte MCP23017_INTCONA = 0x08;
+        private const byte MCP23017_IOCONA = 0x0A;
+        private const byte MCP23017_GPPUA = 0x0C;
+        private const byte MCP23017_INTFA = 0x0E;
+        private const byte MCP23017_INTCAPA = 0x10;
+        private const byte MCP23017_GPIOA = 0x12;
+        private const byte MCP23017_OLATA = 0x14;
 
         //Port B registers
-        const byte MCP23017_IODIRB = 0x01;
-        const byte MCP23017_IPOLB = 0x03;
-        const byte MCP23017_GPINTENB = 0x05;
-        const byte MCP23017_DEFVALB = 0x07;
-        const byte MCP23017_INTCONB = 0x09;
-        const byte MCP23017_IOCONB = 0x0B;
-        const byte MCP23017_GPPUB = 0x0D;
-        const byte MCP23017_INTFB = 0x0F;
-        const byte MCP23017_INTCAPB = 0x11;
-        const byte MCP23017_GPIOB = 0x13;
-        const byte MCP23017_OLATB = 0x15;
+        private const byte MCP23017_IODIRB = 0x01;
+
+        private const byte MCP23017_IPOLB = 0x03;
+        private const byte MCP23017_GPINTENB = 0x05;
+        private const byte MCP23017_DEFVALB = 0x07;
+        private const byte MCP23017_INTCONB = 0x09;
+        private const byte MCP23017_IOCONB = 0x0B;
+        private const byte MCP23017_GPPUB = 0x0D;
+        private const byte MCP23017_INTFB = 0x0F;
+        private const byte MCP23017_INTCAPB = 0x11;
+        private const byte MCP23017_GPIOB = 0x13;
+        private const byte MCP23017_OLATB = 0x15;
 
         public enum Direction { INPUT = 0, OUTPUT = 1 };
+
         public enum Level { LOW = 0, HIGH = 1 };
-        #endregion
+
+        #endregion Constants
 
         #region Constructor
-        public MCP23017(int addr = MCP23017_ADDRESS) :base(addr)
+
+        public Mcp23017(int addr = MCP23017_ADDRESS) : base(addr)
         {
         }
-        #endregion
+
+        #endregion Constructor
 
         #region Initialization
 
@@ -92,9 +93,11 @@ namespace AdafruitClassLibrary
             writeBuffer = new byte[] { MCP23017_IODIRB, 0xFF };
             Write(writeBuffer);
         }
-        #endregion
+
+        #endregion Initialization
 
         #region Operations
+
         /// <summary>
         /// pinMode
         /// Set pin direction, input or output
@@ -133,7 +136,7 @@ namespace AdafruitClassLibrary
             }
             else
             {
-                iodir &= (byte) ~((1 << p));
+                iodir &= (byte)~((1 << p));
             }
 
             // write the new IODIR
@@ -279,7 +282,7 @@ namespace AdafruitClassLibrary
         public void writeGPIOAB(UInt16 ba)
         {
             byte[] writeBuffer;
-            writeBuffer = new byte[] { MCP23017_GPIOA, (byte) (ba & 0xFF), (byte)(ba >> 8) };
+            writeBuffer = new byte[] { MCP23017_GPIOA, (byte)(ba & 0xFF), (byte)(ba >> 8) };
             Write(writeBuffer);
         }
 
@@ -295,9 +298,9 @@ namespace AdafruitClassLibrary
             // read the current GPIO output latches
             readBuffer = new byte[2];
             WriteRead(new byte[] { MCP23017_GPIOA }, readBuffer);
-            return (UInt16)((readBuffer[1] << 8)  | readBuffer[0]);
-
+            return (UInt16)((readBuffer[1] << 8) | readBuffer[0]);
         }
-        #endregion
+
+        #endregion Operations
     }
 }

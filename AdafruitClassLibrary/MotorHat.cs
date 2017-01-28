@@ -17,21 +17,20 @@
   MIT license, all text above must be included in any redistribution.
   ------------------------------------------------------------------------*/
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace AdafruitClassLibrary
 {
-    public class MotorHat : PCA9685
+    public class MotorHat : Pca9685
     {
         #region Subordinate Classes
+
         public class DCMotor
         {
             public enum Command { FORWARD, BACKWARD, RELEASE };
+
             private MotorHat Hat { get; set; }
             private int Index { get; set; }
             private int PWMPin { get; set; }
@@ -49,21 +48,25 @@ namespace AdafruitClassLibrary
                         In2Pin = 9;
                         In1Pin = 10;
                         break;
+
                     case 1:
                         PWMPin = 13;
                         In2Pin = 12;
                         In1Pin = 11;
                         break;
+
                     case 2:
                         PWMPin = 2;
                         In2Pin = 3;
                         In1Pin = 4;
                         break;
+
                     case 3:
                         PWMPin = 7;
                         In2Pin = 6;
                         In1Pin = 5;
                         break;
+
                     default:
                         break;
                 }
@@ -77,14 +80,17 @@ namespace AdafruitClassLibrary
                         Hat.SetPin(In2Pin, PinState.LOW);
                         Hat.SetPin(In1Pin, PinState.HIGH);
                         break;
+
                     case Command.BACKWARD:
                         Hat.SetPin(In1Pin, PinState.LOW);
                         Hat.SetPin(In2Pin, PinState.HIGH);
                         break;
+
                     case Command.RELEASE:
                         Hat.SetPin(In1Pin, PinState.LOW);
                         Hat.SetPin(In2Pin, PinState.LOW);
                         break;
+
                     default:
                         break;
                 }
@@ -99,7 +105,9 @@ namespace AdafruitClassLibrary
         public class Stepper
         {
             public enum Command { FORWARD, BACKWARD };
+
             public enum Style { SINGLE, DOUBLE, INTERLEAVE, MICROSTEP };
+
             private MotorHat Hat { get; set; }
             private int Index { get; set; }
             private int PWMAPin { get; set; }
@@ -115,7 +123,7 @@ namespace AdafruitClassLibrary
 
             private const int MICROSTEPS = 16;         // 8 or 16
 
-            List<int> MicrostepCurve;
+            private List<int> MicrostepCurve;
 
             public Stepper(MotorHat hat, ushort steps, int index)
             {
@@ -138,6 +146,7 @@ namespace AdafruitClassLibrary
                         BIn2Pin = 12;
                         BIn1Pin = 11;
                         break;
+
                     case 1:
                         PWMAPin = 2;
                         AIn2Pin = 3;
@@ -146,6 +155,7 @@ namespace AdafruitClassLibrary
                         BIn2Pin = 6;
                         BIn1Pin = 5;
                         break;
+
                     default:
                         break;
                 }
@@ -165,7 +175,6 @@ namespace AdafruitClassLibrary
                 Hat.SetPWM(PWMAPin, 0);
                 Hat.SetPWM(PWMBPin, 0);
             }
-
 
             public void step(ushort steps, Command direction, Style style)
             {
@@ -301,7 +310,6 @@ namespace AdafruitClassLibrary
                 Hat.SetPWM(PWMAPin, (ushort)(ocra * 16));
                 Hat.SetPWM(PWMBPin, (ushort)(ocrb * 16));
 
-
                 uint latch_state = 0; // all motor pins to 0
 
                 if (style == Style.MICROSTEP)
@@ -322,24 +330,31 @@ namespace AdafruitClassLibrary
                         case 0:
                             latch_state |= 0x1; // energize coil 1 only
                             break;
+
                         case 1:
                             latch_state |= 0x3; // energize coil 1+2
                             break;
+
                         case 2:
                             latch_state |= 0x2; // energize coil 2 only
                             break;
+
                         case 3:
                             latch_state |= 0x6; // energize coil 2+3
                             break;
+
                         case 4:
                             latch_state |= 0x4; // energize coil 3 only
                             break;
+
                         case 5:
                             latch_state |= 0xC; // energize coil 3+4
                             break;
+
                         case 6:
                             latch_state |= 0x8; // energize coil 4 only
                             break;
+
                         case 7:
                             latch_state |= 0x9; // energize coil 1+4
                             break;
@@ -381,6 +396,7 @@ namespace AdafruitClassLibrary
 
                 return CurrentStep;
             }
+
             public void usDelay(long duration)
             {
                 // Static method to initialize and start stopwatch
@@ -391,19 +407,18 @@ namespace AdafruitClassLibrary
 
                 while (sw.ElapsedTicks < durationTicks)
                 {
-
                 }
             }
-
         }
 
-        #endregion
+        #endregion Subordinate Classes
 
         #region Main class
+
         public enum PinState { LOW, HIGH };
 
-        List<DCMotor> MotorList;
-        List<Stepper> StepperList;
+        private List<DCMotor> MotorList;
+        private List<Stepper> StepperList;
 
         public MotorHat(int i2cAddr = 0x60) : base(i2cAddr)
         {
@@ -469,6 +484,7 @@ namespace AdafruitClassLibrary
 
             return StepperList[index];
         }
-        #endregion
+
+        #endregion Main class
     }
 }

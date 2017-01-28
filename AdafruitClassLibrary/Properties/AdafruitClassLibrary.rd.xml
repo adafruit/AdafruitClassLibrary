@@ -28,6 +28,5 @@
   <Library Name="AdafruitClassLibrary">
 
   	<!-- add directives for your library here -->
-
   </Library>
 </Directives>

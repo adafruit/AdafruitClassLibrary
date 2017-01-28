@@ -12,23 +12,23 @@
 
   Adafruit CharLCDPlate is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
   MIT license, all text above must be included in any redistribution.
   ------------------------------------------------------------------------*/
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace AdafruitClassLibrary
 {
-    public class CharLCDPlate
+    public class CharLcdPlate
     {
         // commands
         private const byte LCD_CLEARDISPLAY = 0x01;
+
         private const byte LCD_RETURNHOME = 0x02;
         private const byte LCD_ENTRYMODESET = 0x04;
         private const byte LCDDisplayControl = 0x08;
@@ -37,28 +37,32 @@ namespace AdafruitClassLibrary
         private const byte LCD_SETCGRAMADDR = 0x40;
         private const byte LCD_SETDDRAMADDR = 0x80;
 
-        // flags for display entry mode    
+        // flags for display entry mode
         private const byte LCD_ENTRYRIGHT = 0x00;
+
         private const byte LCD_ENTRYLEFT = 0x02;
         private const byte LCD_ENTRYSHIFTINCREMENT = 0x01;
         private const byte LCD_ENTRYSHIFTDECREMENT = 0x00;
 
         // flags for display on/off control
         private const byte LCD_DISPLAYON = 0x04;
+
         private const byte LCD_DISPLAYOFF = 0x00;
         private const byte LCD_CURSORON = 0x02;
         private const byte LCD_CURSOROFF = 0x00;
         private const byte LCD_BLINKON = 0x01;
         private const byte LCD_BLINKOFF = 0x00;
 
-        // flags for display/cursor shift  
+        // flags for display/cursor shift
         private const byte LCD_DISPLAYMOVE = 0x08;
+
         private const byte LCD_CURSORMOVE = 0x00;
         private const byte LCD_MOVERIGHT = 0x04;
         private const byte LCD_MOVELEFT = 0x00;
 
-        // flags for function set          
+        // flags for function set
         private const byte LCD_8BITMODE = 0x10;
+
         private const byte LCD_4BITMODE = 0x00;
         private const byte LCD_2LINE = 0x08;
         private const byte LCD_1LINE = 0x00;
@@ -71,7 +75,7 @@ namespace AdafruitClassLibrary
         public const byte BUTTON_RIGHT = 0x02;
         public const byte BUTTON_SELECT = 0x01;
 
-        private MCP23017 MCP { get; set; }
+        private Mcp23017 MCP { get; set; }
 
         private byte DisplayFunction { get; set; }
         private byte DisplayControl { get; set; }
@@ -83,6 +87,7 @@ namespace AdafruitClassLibrary
 
         // GPIO Pins
         private byte RSPin { get; set; }
+
         private byte RWPin { get; set; }
         private byte EnablePin { get; set; }
         private List<byte> DataPins { get; set; }
@@ -108,9 +113,9 @@ namespace AdafruitClassLibrary
         /// <summary>
         /// Constructor
         /// </summary>
-        public CharLCDPlate()
+        public CharLcdPlate()
         {
-            MCP = new MCP23017();
+            MCP = new Mcp23017();
 
             DisplayFunction = (byte)(LCD_4BITMODE | LCD_1LINE | LCD_5x8DOTS);
 
@@ -135,28 +140,26 @@ namespace AdafruitClassLibrary
         {
             await MCP.InitMCP23017Async();
 
-            MCP.pinMode(RWPin, MCP23017.Direction.OUTPUT);
-            MCP.pinMode(RSPin, MCP23017.Direction.OUTPUT);
-            MCP.pinMode(EnablePin, MCP23017.Direction.OUTPUT);
+            MCP.pinMode(RWPin, Mcp23017.Direction.OUTPUT);
+            MCP.pinMode(RSPin, Mcp23017.Direction.OUTPUT);
+            MCP.pinMode(EnablePin, Mcp23017.Direction.OUTPUT);
 
             foreach (var pin in DataPins)
             {
-                MCP.pinMode(pin, MCP23017.Direction.OUTPUT);
+                MCP.pinMode(pin, Mcp23017.Direction.OUTPUT);
             }
 
             foreach (var pin in ButtonPins)
             {
-                MCP.pinMode(pin, MCP23017.Direction.INPUT);
-                MCP.pullUp(pin, MCP23017.Level.HIGH);
+                MCP.pinMode(pin, Mcp23017.Direction.INPUT);
+                MCP.pullUp(pin, Mcp23017.Level.HIGH);
             }
 
             foreach (var pin in ColorPins)
             {
-                MCP.pinMode(pin, MCP23017.Direction.OUTPUT);
+                MCP.pinMode(pin, Mcp23017.Direction.OUTPUT);
             }
             setBacklight(WHITE);
-
-
 
             if (lines > 1)
             {
@@ -174,9 +177,9 @@ namespace AdafruitClassLibrary
             }
 
             // Pull both RS and R/W low to begin commands
-            MCP.digitalWrite(RSPin, MCP23017.Level.LOW);
-            MCP.digitalWrite(EnablePin, MCP23017.Level.LOW);
-            MCP.digitalWrite(RWPin, MCP23017.Level.LOW);
+            MCP.digitalWrite(RSPin, Mcp23017.Level.LOW);
+            MCP.digitalWrite(EnablePin, Mcp23017.Level.LOW);
+            MCP.digitalWrite(RWPin, Mcp23017.Level.LOW);
 
             //put the LCD into 4 bit or 8 bit mode
             if (0 == (DisplayFunction & LCD_8BITMODE))
@@ -230,7 +233,6 @@ namespace AdafruitClassLibrary
             DisplayMode = (byte)(LCD_ENTRYLEFT | LCD_ENTRYSHIFTDECREMENT);
             // set the entry mode
             command((byte)(LCD_ENTRYMODESET | DisplayMode));
-
         }
 
         /// <summary>
@@ -434,9 +436,9 @@ namespace AdafruitClassLibrary
         /// <param name="color"></param>
         public void setBacklight(int color)
         {
-            MCP.digitalWrite(8, (MCP23017.Level)(~(color >> 2) & 0x1));
-            MCP.digitalWrite(7, (MCP23017.Level)(~(color >> 1) & 0x1));
-            MCP.digitalWrite(6, (MCP23017.Level)(~color & 0x1));
+            MCP.digitalWrite(8, (Mcp23017.Level)(~(color >> 2) & 0x1));
+            MCP.digitalWrite(7, (Mcp23017.Level)(~(color >> 1) & 0x1));
+            MCP.digitalWrite(6, (Mcp23017.Level)(~color & 0x1));
         }
 
         /// <summary>
@@ -455,7 +457,7 @@ namespace AdafruitClassLibrary
                     Math.Min(NumLines, CurrentLine++);
                     CurrentCol = 0;
                 }
-                setCursor((byte)CurrentCol,(byte) CurrentLine);
+                setCursor((byte)CurrentCol, (byte)CurrentLine);
             }
         }
 
@@ -479,26 +481,28 @@ namespace AdafruitClassLibrary
             print(number.ToString());
         }
 
-        #region  mid level commands
+        #region mid level commands
+
         private void command(byte value)
         {
-            send(value, MCP23017.Level.LOW);
+            send(value, Mcp23017.Level.LOW);
         }
 
         private void write(byte value)
         {
-            send(value, MCP23017.Level.HIGH);
+            send(value, Mcp23017.Level.HIGH);
         }
-        #endregion
+
+        #endregion mid level commands
 
         #region low level commands
 
         // write either command or data, with automatic 4/8-bit selection
-        private void send(byte value, MCP23017.Level mode)
+        private void send(byte value, Mcp23017.Level mode)
         {
             MCP.digitalWrite(RSPin, mode);
 
-            MCP.digitalWrite(RWPin, MCP23017.Level.LOW);
+            MCP.digitalWrite(RWPin, Mcp23017.Level.LOW);
 
             write4bits((byte)(value >> 4));
             write4bits(value);
@@ -527,16 +531,15 @@ namespace AdafruitClassLibrary
 
         private void pulseEnable()
         {
-            MCP.digitalWrite(EnablePin, MCP23017.Level.LOW);
+            MCP.digitalWrite(EnablePin, Mcp23017.Level.LOW);
             usDelay(2);
-            MCP.digitalWrite(EnablePin, MCP23017.Level.HIGH);
+            MCP.digitalWrite(EnablePin, Mcp23017.Level.HIGH);
             usDelay(2);    // enable pulse must be >450ns
-            MCP.digitalWrite(EnablePin, MCP23017.Level.LOW);
+            MCP.digitalWrite(EnablePin, Mcp23017.Level.LOW);
             usDelay(100);   // commands need > 37us to settle
         }
 
-
-        #endregion
+        #endregion low level commands
 
         /// <summary>
         /// usDelay
@@ -553,7 +556,6 @@ namespace AdafruitClassLibrary
 
             while (sw.ElapsedTicks < durationTicks)
             {
-
             }
         }
     }
