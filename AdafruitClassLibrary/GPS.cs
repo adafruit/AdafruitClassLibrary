@@ -16,23 +16,22 @@
 
   MIT license, all text above must be included in any redistribution.
   ------------------------------------------------------------------------*/
+
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Globalization;
+using System.Threading;
 using System.Threading.Tasks;
+using Windows.Devices.Enumeration;
 using Windows.Devices.SerialCommunication;
 using Windows.Storage.Streams;
-using System.Collections.ObjectModel;
-using Windows.Devices.Enumeration;
-using System.Threading;
-using System.Globalization;
 
 namespace AdafruitClassLibrary
 {
-    public class GPS
+    public class Gps
     {
         #region Properties
+
         private SerialDevice SerialPort { get; set; }
         private DataWriter DataWriterObject { get; set; }
         private DataReader DataReaderObject { get; set; }
@@ -155,11 +154,11 @@ namespace AdafruitClassLibrary
             }
         }
 
-        #endregion
+        #endregion Properties
 
-        CancellationTokenSource ReadCancellationTokenSource;
+        private CancellationTokenSource ReadCancellationTokenSource;
 
-        public GPS()
+        public Gps()
         {
             SerialPort = null;
             DataWriterObject = null;
@@ -174,6 +173,7 @@ namespace AdafruitClassLibrary
         }
 
         #region GPS Commands
+
         /// <summary>
         /// SetSentencesReporting: Set which sentences to report and their individual reporting frequency in fix intervals
         ///  0: for no sentence reporting
@@ -182,7 +182,7 @@ namespace AdafruitClassLibrary
         ///  3..5: once every 3 to 5 position fixes
         /// </summary>
         /// <param name="GLLfreq"></param>
-        /// <param name="RMCfreq"></param> 
+        /// <param name="RMCfreq"></param>
         /// <param name="VTGfreq"></param>
         /// <param name="GGAfreq"></param>
         /// <param name="GSAfreq"></param>
@@ -208,7 +208,6 @@ namespace AdafruitClassLibrary
             cmdString = string.Concat(cmdString, "\r\n");
 
             await SendCommandAsync(cmdString);
-
         }
 
         /// <summary>
@@ -242,7 +241,7 @@ namespace AdafruitClassLibrary
         public async Task SetBaudRateAsync(uint baudrate)
         {
             string cmdString = "PMTK251";
-            cmdString = string.Concat(string.Concat(cmdString, ","),baudrate.ToString());
+            cmdString = string.Concat(string.Concat(cmdString, ","), baudrate.ToString());
 
             uint checksum = 0;
             for (int index = 0; index < cmdString.Length; index++)
@@ -257,7 +256,7 @@ namespace AdafruitClassLibrary
 
         /// <summary>
         /// SetPMTKCommand
-        /// Generic send for a PMTK command.  Argument string should include leading '$', checksum, 
+        /// Generic send for a PMTK command.  Argument string should include leading '$', checksum,
         /// and trailing CR/LF
         /// </summary>
         /// <param name="pmtk"></param>
@@ -267,9 +266,10 @@ namespace AdafruitClassLibrary
             await SendCommandAsync(pmtk);
         }
 
-        #endregion
+        #endregion GPS Commands
 
         #region Serial Control
+
         /// <summary>
         /// Connected
         /// Predicate returns true if UART is connected
@@ -282,7 +282,7 @@ namespace AdafruitClassLibrary
 
         /// <summary>
         /// ConnectToUART
-        /// - Use SerialDevice.GetDeviceSelector to find serial device named "UART0". 
+        /// - Use SerialDevice.GetDeviceSelector to find serial device named "UART0".
         ///   This is the built-in Raspberry Pi serial port.
         /// </summary>
         /// <param name="baudRate"></param>
@@ -329,7 +329,7 @@ namespace AdafruitClassLibrary
                 SerialPort = null;
             }
         }
-        
+
         /// <summary>
         /// StartReading
         /// Starts process to read NMEA sentences from UART
@@ -450,7 +450,7 @@ namespace AdafruitClassLibrary
                     for (int b = 0; b < bytesRead; b++)
                     {
                         DataReaderObject.ReadByte();
-                      //  bytesRead--;
+                        //  bytesRead--;
                     }
                 }
                 catch (Exception ex)
@@ -496,9 +496,10 @@ namespace AdafruitClassLibrary
             }
         }
 
-        #endregion
+        #endregion Serial Control
 
         #region Parsing
+
         /// <summary>
         /// IsValid
         /// Checks PMTK sentence, including checksum. Returns true if sentence is valid
@@ -557,22 +558,27 @@ namespace AdafruitClassLibrary
                         RMC = new GPSRMC(sentence.Substring(sentence.IndexOf(',') + 1));
                         OnRMCEvent(RMC);
                         break;
+
                     case "GPGGA":
                         GGA = new GPSGGA(sentence.Substring(sentence.IndexOf(',') + 1));
                         OnGGAEvent(GGA);
                         break;
+
                     case "GPGLL":
                         GLL = new GPSGLL(sentence.Substring(sentence.IndexOf(',') + 1));
                         OnGLLEvent(GLL);
                         break;
+
                     case "GPVTG":
                         VTG = new GPSVTG(sentence.Substring(sentence.IndexOf(',') + 1));
                         OnVTGEvent(VTG);
                         break;
+
                     case "GPGSA":
                         GSA = new GPSGSA(sentence.Substring(sentence.IndexOf(',') + 1));
                         OnGSAEvent(GSA);
                         break;
+
                     case "GPGSV":
                         GSV = new GPSGSV(sentence.Substring(sentence.IndexOf(',') + 1));
                         OnGSVEvent(GSV);
@@ -602,9 +608,10 @@ namespace AdafruitClassLibrary
             return isAck;
         }
 
-        #endregion
+        #endregion Parsing
 
         #region Data Classes
+
         public class GPSRMC : SentenceBase
         {
             public DateTime TimeStamp { get; set; }
@@ -811,8 +818,6 @@ namespace AdafruitClassLibrary
                 HDOP = ParseDouble(splitString[15]);          // HDOP
                 VDOP = ParseDouble(splitString[16]);          // VDOP
             }
-
-
         }
 
         public class GPSGSV : SentenceBase
@@ -901,6 +906,7 @@ namespace AdafruitClassLibrary
                 DateTime stamp = DateTime.Parse(timeStr, CultureInfo.InvariantCulture);
                 return stamp;
             }
+
             protected DateTime ParseDateStamp(string dateStr)
             {
                 dateStr = dateStr.Insert(4, "-");
@@ -908,7 +914,7 @@ namespace AdafruitClassLibrary
 
                 //this wretched kludge exists because DateTime.ParseExact doesn't appear to work.
                 //  so, we have to rearrange the month and day to make Parse happy
-                string[] components = dateStr.Split(new char[]{'-'});
+                string[] components = dateStr.Split(new char[] { '-' });
                 dateStr = components[1] + '-' + components[0] + '-' + components[2];
 
                 DateTime stamp = DateTime.Parse(dateStr, CultureInfo.InvariantCulture);
@@ -932,23 +938,36 @@ namespace AdafruitClassLibrary
                 }
                 return degrees;
             }
-    }
-    #endregion
-    #region Events
-    // Delegate declarations
-    //
-    public delegate void RMCEventHandler(object sender, GPSRMC e);
+        }
+
+        #endregion Data Classes
+
+        #region Events
+
+        // Delegate declarations
+        //
+        public delegate void RMCEventHandler(object sender, GPSRMC e);
+
         public delegate void GLLEventHandler(object sender, GPSGLL e);
+
         public delegate void VTGEventHandler(object sender, GPSVTG e);
+
         public delegate void GGAEventHandler(object sender, GPSGGA e);
+
         public delegate void GSAEventHandler(object sender, GPSGSA e);
+
         public delegate void GSVEventHandler(object sender, GPSGSV e);
 
         public event RMCEventHandler RMCEvent;
+
         public event GLLEventHandler GLLEvent;
+
         public event VTGEventHandler VTGEvent;
+
         public event GGAEventHandler GGAEvent;
+
         public event GSAEventHandler GSAEvent;
+
         public event GSVEventHandler GSVEvent;
 
         protected virtual void OnRMCEvent(GPSRMC e)
@@ -981,10 +1000,6 @@ namespace AdafruitClassLibrary
             GSVEvent(this, e);
         }
 
-
-        #endregion
-
-
+        #endregion Events
     }
-
 }

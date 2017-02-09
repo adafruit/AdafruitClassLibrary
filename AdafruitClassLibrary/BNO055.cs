@@ -16,21 +16,22 @@
 
   MIT license, all text above must be included in any redistribution.
   ------------------------------------------------------------------------*/
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Windows.Devices.SerialCommunication;
-using Windows.Storage.Streams;
 using Windows.Devices.Enumeration;
 using Windows.Devices.Gpio;
+using Windows.Devices.SerialCommunication;
+using Windows.Storage.Streams;
 
 namespace AdafruitClassLibrary
 {
-    public class BNO055
+    public class Bno055
     {
         #region class definitions
+
         public class Revisions
         {
             public int Software { get; set; }
@@ -87,208 +88,237 @@ namespace AdafruitClassLibrary
             public double Z { get; set; }
         }
 
-        #endregion
+        #endregion class definitions
+
         #region Register Definitions
+
         // I2C addresses
-        const byte BNO055_ADDRESS_A = 0x28;
-        const byte BNO055_ADDRESS_B = 0x29;
-        const byte BNO055_ID = 0xA0;
+        private const byte BNO055_ADDRESS_A = 0x28;
+
+        private const byte BNO055_ADDRESS_B = 0x29;
+        private const byte BNO055_ID = 0xA0;
 
         // Page id register definition
-        const byte BNO055_PAGE_ID_ADDR = 0X07;
+        private const byte BNO055_PAGE_ID_ADDR = 0X07;
 
         // PAGE0 REGISTER DEFINITION START
-        const byte BNO055_CHIP_ID_ADDR = 0x00;
-        const byte BNO055_ACCEL_REV_ID_ADDR = 0x01;
-        const byte BNO055_MAG_REV_ID_ADDR = 0x02;
-        const byte BNO055_GYRO_REV_ID_ADDR = 0x03;
-        const byte BNO055_SW_REV_ID_LSB_ADDR = 0x04;
-        const byte BNO055_SW_REV_ID_MSB_ADDR = 0x05;
-        const byte BNO055_BL_REV_ID_ADDR = 0X06;
+        private const byte BNO055_CHIP_ID_ADDR = 0x00;
+
+        private const byte BNO055_ACCEL_REV_ID_ADDR = 0x01;
+        private const byte BNO055_MAG_REV_ID_ADDR = 0x02;
+        private const byte BNO055_GYRO_REV_ID_ADDR = 0x03;
+        private const byte BNO055_SW_REV_ID_LSB_ADDR = 0x04;
+        private const byte BNO055_SW_REV_ID_MSB_ADDR = 0x05;
+        private const byte BNO055_BL_REV_ID_ADDR = 0X06;
 
         // Accel data register
-        const byte BNO055_ACCEL_DATA_X_LSB_ADDR = 0X08;
-        const byte BNO055_ACCEL_DATA_X_MSB_ADDR = 0X09;
-        const byte BNO055_ACCEL_DATA_Y_LSB_ADDR = 0X0A;
-        const byte BNO055_ACCEL_DATA_Y_MSB_ADDR = 0X0B;
-        const byte BNO055_ACCEL_DATA_Z_LSB_ADDR = 0X0C;
-        const byte BNO055_ACCEL_DATA_Z_MSB_ADDR = 0X0D;
+        private const byte BNO055_ACCEL_DATA_X_LSB_ADDR = 0X08;
+
+        private const byte BNO055_ACCEL_DATA_X_MSB_ADDR = 0X09;
+        private const byte BNO055_ACCEL_DATA_Y_LSB_ADDR = 0X0A;
+        private const byte BNO055_ACCEL_DATA_Y_MSB_ADDR = 0X0B;
+        private const byte BNO055_ACCEL_DATA_Z_LSB_ADDR = 0X0C;
+        private const byte BNO055_ACCEL_DATA_Z_MSB_ADDR = 0X0D;
 
         // Mag data register
-        const byte BNO055_MAG_DATA_X_LSB_ADDR = 0X0E;
-        const byte BNO055_MAG_DATA_X_MSB_ADDR = 0X0F;
-        const byte BNO055_MAG_DATA_Y_LSB_ADDR = 0X10;
-        const byte BNO055_MAG_DATA_Y_MSB_ADDR = 0X11;
-        const byte BNO055_MAG_DATA_Z_LSB_ADDR = 0X12;
-        const byte BNO055_MAG_DATA_Z_MSB_ADDR = 0X13;
+        private const byte BNO055_MAG_DATA_X_LSB_ADDR = 0X0E;
+
+        private const byte BNO055_MAG_DATA_X_MSB_ADDR = 0X0F;
+        private const byte BNO055_MAG_DATA_Y_LSB_ADDR = 0X10;
+        private const byte BNO055_MAG_DATA_Y_MSB_ADDR = 0X11;
+        private const byte BNO055_MAG_DATA_Z_LSB_ADDR = 0X12;
+        private const byte BNO055_MAG_DATA_Z_MSB_ADDR = 0X13;
 
         // Gyro data registers
-        const byte BNO055_GYRO_DATA_X_LSB_ADDR = 0X14;
-        const byte BNO055_GYRO_DATA_X_MSB_ADDR = 0X15;
-        const byte BNO055_GYRO_DATA_Y_LSB_ADDR = 0X16;
-        const byte BNO055_GYRO_DATA_Y_MSB_ADDR = 0X17;
-        const byte BNO055_GYRO_DATA_Z_LSB_ADDR = 0X18;
-        const byte BNO055_GYRO_DATA_Z_MSB_ADDR = 0X19;
+        private const byte BNO055_GYRO_DATA_X_LSB_ADDR = 0X14;
+
+        private const byte BNO055_GYRO_DATA_X_MSB_ADDR = 0X15;
+        private const byte BNO055_GYRO_DATA_Y_LSB_ADDR = 0X16;
+        private const byte BNO055_GYRO_DATA_Y_MSB_ADDR = 0X17;
+        private const byte BNO055_GYRO_DATA_Z_LSB_ADDR = 0X18;
+        private const byte BNO055_GYRO_DATA_Z_MSB_ADDR = 0X19;
 
         // Euler data registers
-        const byte BNO055_EULER_H_LSB_ADDR = 0X1A;
-        const byte BNO055_EULER_H_MSB_ADDR = 0X1B;
-        const byte BNO055_EULER_R_LSB_ADDR = 0X1C;
-        const byte BNO055_EULER_R_MSB_ADDR = 0X1D;
-        const byte BNO055_EULER_P_LSB_ADDR = 0X1E;
-        const byte BNO055_EULER_P_MSB_ADDR = 0X1F;
+        private const byte BNO055_EULER_H_LSB_ADDR = 0X1A;
+
+        private const byte BNO055_EULER_H_MSB_ADDR = 0X1B;
+        private const byte BNO055_EULER_R_LSB_ADDR = 0X1C;
+        private const byte BNO055_EULER_R_MSB_ADDR = 0X1D;
+        private const byte BNO055_EULER_P_LSB_ADDR = 0X1E;
+        private const byte BNO055_EULER_P_MSB_ADDR = 0X1F;
 
         // Quaternion data registers
-        const byte BNO055_QUATERNION_DATA_W_LSB_ADDR = 0X20;
-        const byte BNO055_QUATERNION_DATA_W_MSB_ADDR = 0X21;
-        const byte BNO055_QUATERNION_DATA_X_LSB_ADDR = 0X22;
-        const byte BNO055_QUATERNION_DATA_X_MSB_ADDR = 0X23;
-        const byte BNO055_QUATERNION_DATA_Y_LSB_ADDR = 0X24;
-        const byte BNO055_QUATERNION_DATA_Y_MSB_ADDR = 0X25;
-        const byte BNO055_QUATERNION_DATA_Z_LSB_ADDR = 0X26;
-        const byte BNO055_QUATERNION_DATA_Z_MSB_ADDR = 0X27;
+        private const byte BNO055_QUATERNION_DATA_W_LSB_ADDR = 0X20;
+
+        private const byte BNO055_QUATERNION_DATA_W_MSB_ADDR = 0X21;
+        private const byte BNO055_QUATERNION_DATA_X_LSB_ADDR = 0X22;
+        private const byte BNO055_QUATERNION_DATA_X_MSB_ADDR = 0X23;
+        private const byte BNO055_QUATERNION_DATA_Y_LSB_ADDR = 0X24;
+        private const byte BNO055_QUATERNION_DATA_Y_MSB_ADDR = 0X25;
+        private const byte BNO055_QUATERNION_DATA_Z_LSB_ADDR = 0X26;
+        private const byte BNO055_QUATERNION_DATA_Z_MSB_ADDR = 0X27;
 
         // Linear acceleration data registers
-        const byte BNO055_LINEAR_ACCEL_DATA_X_LSB_ADDR = 0X28;
-        const byte BNO055_LINEAR_ACCEL_DATA_X_MSB_ADDR = 0X29;
-        const byte BNO055_LINEAR_ACCEL_DATA_Y_LSB_ADDR = 0X2A;
-        const byte BNO055_LINEAR_ACCEL_DATA_Y_MSB_ADDR = 0X2B;
-        const byte BNO055_LINEAR_ACCEL_DATA_Z_LSB_ADDR = 0X2C;
-        const byte BNO055_LINEAR_ACCEL_DATA_Z_MSB_ADDR = 0X2D;
+        private const byte BNO055_LINEAR_ACCEL_DATA_X_LSB_ADDR = 0X28;
+
+        private const byte BNO055_LINEAR_ACCEL_DATA_X_MSB_ADDR = 0X29;
+        private const byte BNO055_LINEAR_ACCEL_DATA_Y_LSB_ADDR = 0X2A;
+        private const byte BNO055_LINEAR_ACCEL_DATA_Y_MSB_ADDR = 0X2B;
+        private const byte BNO055_LINEAR_ACCEL_DATA_Z_LSB_ADDR = 0X2C;
+        private const byte BNO055_LINEAR_ACCEL_DATA_Z_MSB_ADDR = 0X2D;
 
         // Gravity data registers
-        const byte BNO055_GRAVITY_DATA_X_LSB_ADDR = 0X2E;
-        const byte BNO055_GRAVITY_DATA_X_MSB_ADDR = 0X2F;
-        const byte BNO055_GRAVITY_DATA_Y_LSB_ADDR = 0X30;
-        const byte BNO055_GRAVITY_DATA_Y_MSB_ADDR = 0X31;
-        const byte BNO055_GRAVITY_DATA_Z_LSB_ADDR = 0X32;
-        const byte BNO055_GRAVITY_DATA_Z_MSB_ADDR = 0X33;
+        private const byte BNO055_GRAVITY_DATA_X_LSB_ADDR = 0X2E;
+
+        private const byte BNO055_GRAVITY_DATA_X_MSB_ADDR = 0X2F;
+        private const byte BNO055_GRAVITY_DATA_Y_LSB_ADDR = 0X30;
+        private const byte BNO055_GRAVITY_DATA_Y_MSB_ADDR = 0X31;
+        private const byte BNO055_GRAVITY_DATA_Z_LSB_ADDR = 0X32;
+        private const byte BNO055_GRAVITY_DATA_Z_MSB_ADDR = 0X33;
 
         // Temperature data register
-        const byte BNO055_TEMP_ADDR = 0X34;
+        private const byte BNO055_TEMP_ADDR = 0X34;
 
         // Status registers
-        const byte BNO055_CALIB_STAT_ADDR = 0X35;
-        const byte BNO055_SELFTEST_RESULT_ADDR = 0X36;
-        const byte BNO055_INTR_STAT_ADDR = 0X37;
+        private const byte BNO055_CALIB_STAT_ADDR = 0X35;
 
-        const byte BNO055_SYS_CLK_STAT_ADDR = 0X38;
-        const byte BNO055_SYS_STAT_ADDR = 0X39;
-        const byte BNO055_SYS_ERR_ADDR = 0X3A;
+        private const byte BNO055_SELFTEST_RESULT_ADDR = 0X36;
+        private const byte BNO055_INTR_STAT_ADDR = 0X37;
+
+        private const byte BNO055_SYS_CLK_STAT_ADDR = 0X38;
+        private const byte BNO055_SYS_STAT_ADDR = 0X39;
+        private const byte BNO055_SYS_ERR_ADDR = 0X3A;
 
         // Unit selection register
-        const byte BNO055_UNIT_SEL_ADDR = 0X3B;
-        const byte BNO055_DATA_SELECT_ADDR = 0X3C;
+        private const byte BNO055_UNIT_SEL_ADDR = 0X3B;
+
+        private const byte BNO055_DATA_SELECT_ADDR = 0X3C;
 
         // Mode registers
-        const byte BNO055_OPR_MODE_ADDR = 0X3D;
-        const byte BNO055_PWR_MODE_ADDR = 0X3E;
+        private const byte BNO055_OPR_MODE_ADDR = 0X3D;
 
-        const byte BNO055_SYS_TRIGGER_ADDR = 0X3F;
-        const byte BNO055_TEMP_SOURCE_ADDR = 0X40;
+        private const byte BNO055_PWR_MODE_ADDR = 0X3E;
+
+        private const byte BNO055_SYS_TRIGGER_ADDR = 0X3F;
+        private const byte BNO055_TEMP_SOURCE_ADDR = 0X40;
 
         // Axis remap registers
-        const byte BNO055_AXIS_MAP_CONFIG_ADDR = 0X41;
-        const byte BNO055_AXIS_MAP_SIGN_ADDR = 0X42;
+        private const byte BNO055_AXIS_MAP_CONFIG_ADDR = 0X41;
+
+        private const byte BNO055_AXIS_MAP_SIGN_ADDR = 0X42;
 
         // Axis remap values
-        const byte AXIS_REMAP_X = 0x00;
-        const byte AXIS_REMAP_Y = 0x01;
-        const byte AXIS_REMAP_Z = 0x02;
-        const byte AXIS_REMAP_POSITIVE = 0x00;
-        const byte AXIS_REMAP_NEGATIVE = 0x01;
+        private const byte AXIS_REMAP_X = 0x00;
+
+        private const byte AXIS_REMAP_Y = 0x01;
+        private const byte AXIS_REMAP_Z = 0x02;
+        private const byte AXIS_REMAP_POSITIVE = 0x00;
+        private const byte AXIS_REMAP_NEGATIVE = 0x01;
 
         // SIC registers
-        const byte BNO055_SIC_MATRIX_0_LSB_ADDR = 0X43;
-        const byte BNO055_SIC_MATRIX_0_MSB_ADDR = 0X44;
-        const byte BNO055_SIC_MATRIX_1_LSB_ADDR = 0X45;
-        const byte BNO055_SIC_MATRIX_1_MSB_ADDR = 0X46;
-        const byte BNO055_SIC_MATRIX_2_LSB_ADDR = 0X47;
-        const byte BNO055_SIC_MATRIX_2_MSB_ADDR = 0X48;
-        const byte BNO055_SIC_MATRIX_3_LSB_ADDR = 0X49;
-        const byte BNO055_SIC_MATRIX_3_MSB_ADDR = 0X4A;
-        const byte BNO055_SIC_MATRIX_4_LSB_ADDR = 0X4B;
-        const byte BNO055_SIC_MATRIX_4_MSB_ADDR = 0X4C;
-        const byte BNO055_SIC_MATRIX_5_LSB_ADDR = 0X4D;
-        const byte BNO055_SIC_MATRIX_5_MSB_ADDR = 0X4E;
-        const byte BNO055_SIC_MATRIX_6_LSB_ADDR = 0X4F;
-        const byte BNO055_SIC_MATRIX_6_MSB_ADDR = 0X50;
-        const byte BNO055_SIC_MATRIX_7_LSB_ADDR = 0X51;
-        const byte BNO055_SIC_MATRIX_7_MSB_ADDR = 0X52;
-        const byte BNO055_SIC_MATRIX_8_LSB_ADDR = 0X53;
-        const byte BNO055_SIC_MATRIX_8_MSB_ADDR = 0X54;
+        private const byte BNO055_SIC_MATRIX_0_LSB_ADDR = 0X43;
+
+        private const byte BNO055_SIC_MATRIX_0_MSB_ADDR = 0X44;
+        private const byte BNO055_SIC_MATRIX_1_LSB_ADDR = 0X45;
+        private const byte BNO055_SIC_MATRIX_1_MSB_ADDR = 0X46;
+        private const byte BNO055_SIC_MATRIX_2_LSB_ADDR = 0X47;
+        private const byte BNO055_SIC_MATRIX_2_MSB_ADDR = 0X48;
+        private const byte BNO055_SIC_MATRIX_3_LSB_ADDR = 0X49;
+        private const byte BNO055_SIC_MATRIX_3_MSB_ADDR = 0X4A;
+        private const byte BNO055_SIC_MATRIX_4_LSB_ADDR = 0X4B;
+        private const byte BNO055_SIC_MATRIX_4_MSB_ADDR = 0X4C;
+        private const byte BNO055_SIC_MATRIX_5_LSB_ADDR = 0X4D;
+        private const byte BNO055_SIC_MATRIX_5_MSB_ADDR = 0X4E;
+        private const byte BNO055_SIC_MATRIX_6_LSB_ADDR = 0X4F;
+        private const byte BNO055_SIC_MATRIX_6_MSB_ADDR = 0X50;
+        private const byte BNO055_SIC_MATRIX_7_LSB_ADDR = 0X51;
+        private const byte BNO055_SIC_MATRIX_7_MSB_ADDR = 0X52;
+        private const byte BNO055_SIC_MATRIX_8_LSB_ADDR = 0X53;
+        private const byte BNO055_SIC_MATRIX_8_MSB_ADDR = 0X54;
 
         // Accelerometer Offset registers
-        const byte ACCEL_OFFSET_X_LSB_ADDR = 0X55;
-        const byte ACCEL_OFFSET_X_MSB_ADDR = 0X56;
-        const byte ACCEL_OFFSET_Y_LSB_ADDR = 0X57;
-        const byte ACCEL_OFFSET_Y_MSB_ADDR = 0X58;
-        const byte ACCEL_OFFSET_Z_LSB_ADDR = 0X59;
-        const byte ACCEL_OFFSET_Z_MSB_ADDR = 0X5A;
+        private const byte ACCEL_OFFSET_X_LSB_ADDR = 0X55;
+
+        private const byte ACCEL_OFFSET_X_MSB_ADDR = 0X56;
+        private const byte ACCEL_OFFSET_Y_LSB_ADDR = 0X57;
+        private const byte ACCEL_OFFSET_Y_MSB_ADDR = 0X58;
+        private const byte ACCEL_OFFSET_Z_LSB_ADDR = 0X59;
+        private const byte ACCEL_OFFSET_Z_MSB_ADDR = 0X5A;
 
         // Magnetometer Offset registers
-        const byte MAG_OFFSET_X_LSB_ADDR = 0X5B;
-        const byte MAG_OFFSET_X_MSB_ADDR = 0X5C;
-        const byte MAG_OFFSET_Y_LSB_ADDR = 0X5D;
-        const byte MAG_OFFSET_Y_MSB_ADDR = 0X5E;
-        const byte MAG_OFFSET_Z_LSB_ADDR = 0X5F;
-        const byte MAG_OFFSET_Z_MSB_ADDR = 0X60;
+        private const byte MAG_OFFSET_X_LSB_ADDR = 0X5B;
+
+        private const byte MAG_OFFSET_X_MSB_ADDR = 0X5C;
+        private const byte MAG_OFFSET_Y_LSB_ADDR = 0X5D;
+        private const byte MAG_OFFSET_Y_MSB_ADDR = 0X5E;
+        private const byte MAG_OFFSET_Z_LSB_ADDR = 0X5F;
+        private const byte MAG_OFFSET_Z_MSB_ADDR = 0X60;
 
         // Gyroscope Offset register s
-        const byte GYRO_OFFSET_X_LSB_ADDR = 0X61;
-        const byte GYRO_OFFSET_X_MSB_ADDR = 0X62;
-        const byte GYRO_OFFSET_Y_LSB_ADDR = 0X63;
-        const byte GYRO_OFFSET_Y_MSB_ADDR = 0X64;
-        const byte GYRO_OFFSET_Z_LSB_ADDR = 0X65;
-        const byte GYRO_OFFSET_Z_MSB_ADDR = 0X66;
+        private const byte GYRO_OFFSET_X_LSB_ADDR = 0X61;
+
+        private const byte GYRO_OFFSET_X_MSB_ADDR = 0X62;
+        private const byte GYRO_OFFSET_Y_LSB_ADDR = 0X63;
+        private const byte GYRO_OFFSET_Y_MSB_ADDR = 0X64;
+        private const byte GYRO_OFFSET_Z_LSB_ADDR = 0X65;
+        private const byte GYRO_OFFSET_Z_MSB_ADDR = 0X66;
 
         // Radius registers
-        const byte ACCEL_RADIUS_LSB_ADDR = 0X67;
-        const byte ACCEL_RADIUS_MSB_ADDR = 0X68;
-        const byte MAG_RADIUS_LSB_ADDR = 0X69;
-        const byte MAG_RADIUS_MSB_ADDR = 0X6A;
+        private const byte ACCEL_RADIUS_LSB_ADDR = 0X67;
+
+        private const byte ACCEL_RADIUS_MSB_ADDR = 0X68;
+        private const byte MAG_RADIUS_LSB_ADDR = 0X69;
+        private const byte MAG_RADIUS_MSB_ADDR = 0X6A;
 
         // Power modes
-        const byte POWER_MODE_NORMAL = 0X00;
-        const byte POWER_MODE_LOWPOWER = 0X01;
-        const byte POWER_MODE_SUSPEND = 0X02;
+        private const byte POWER_MODE_NORMAL = 0X00;
+
+        private const byte POWER_MODE_LOWPOWER = 0X01;
+        private const byte POWER_MODE_SUSPEND = 0X02;
 
         // Operation mode settings
-        public enum OperationMode { 
-                    OPERATION_MODE_CONFIG                = 0X00,
-                    OPERATION_MODE_ACCONLY               = 0X01,
-                    OPERATION_MODE_MAGONLY               = 0X02,
-                    OPERATION_MODE_GYRONLY               = 0X03,
-                    OPERATION_MODE_ACCMAG                = 0X04,
-                    OPERATION_MODE_ACCGYRO               = 0X05,
-                    OPERATION_MODE_MAGGYRO               = 0X06,
-                    OPERATION_MODE_AMG                   = 0X07,
-                    OPERATION_MODE_IMUPLUS               = 0X08,
-                    OPERATION_MODE_COMPASS               = 0X09,
-                    OPERATION_MODE_M4G                   = 0X0A,
-                    OPERATION_MODE_NDOF_FMC_OFF          = 0X0B,
-                    OPERATION_MODE_NDOF                  = 0X0C
-            };
-        #endregion
+        public enum OperationMode
+        {
+            OPERATION_MODE_CONFIG = 0X00,
+            OPERATION_MODE_ACCONLY = 0X01,
+            OPERATION_MODE_MAGONLY = 0X02,
+            OPERATION_MODE_GYRONLY = 0X03,
+            OPERATION_MODE_ACCMAG = 0X04,
+            OPERATION_MODE_ACCGYRO = 0X05,
+            OPERATION_MODE_MAGGYRO = 0X06,
+            OPERATION_MODE_AMG = 0X07,
+            OPERATION_MODE_IMUPLUS = 0X08,
+            OPERATION_MODE_COMPASS = 0X09,
+            OPERATION_MODE_M4G = 0X0A,
+            OPERATION_MODE_NDOF_FMC_OFF = 0X0B,
+            OPERATION_MODE_NDOF = 0X0C
+        };
+
+        #endregion Register Definitions
 
         #region Properties
+
         private SerialDevice SerialPort { get; set; }
         private DataWriter DataWriterObject { get; set; }
         private DataReader DataReaderObject { get; set; }
         private GpioPin ResetPin { get; set; }
         private OperationMode OperatingMode { get; set; }
-        #endregion
+
+        #endregion Properties
 
         #region Constructor
-        public BNO055()
+
+        public Bno055()
         {
             SerialPort = null;
             DataWriterObject = null;
             DataReaderObject = null;
         }
-        #endregion
+
+        #endregion Constructor
 
         #region SerialControl
+
         /// <summary>
         /// Connected
         /// Predicate returns true if UART is connected
@@ -301,7 +331,7 @@ namespace AdafruitClassLibrary
 
         /// <summary>
         /// ConnectToUART
-        /// - Use SerialDevice.GetDeviceSelector to find serial device named "UART0". 
+        /// - Use SerialDevice.GetDeviceSelector to find serial device named "UART0".
         ///   This is the built-in Raspberry Pi serial port.
         /// </summary>
         /// <param name="baudRate"></param>
@@ -367,7 +397,7 @@ namespace AdafruitClassLibrary
             }
         }
 
-        #endregion
+        #endregion SerialControl
 
         #region Serial IO
 
@@ -404,7 +434,6 @@ namespace AdafruitClassLibrary
             uint bytesRead = await loadAsyncTask;
             if (length != bytesRead)
                 throw new Exception("ReadDataAsync timeout");
-
         }
 
         /// <summary>
@@ -495,7 +524,7 @@ namespace AdafruitClassLibrary
             {
                 readBuffer = ReadData(commandBuffer, 1);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine(string.Format("ReadRegister error: {0}", ex.Message));
             }
@@ -530,9 +559,11 @@ namespace AdafruitClassLibrary
         {
             WriteRegister(BNO055_OPR_MODE_ADDR, (byte)mode);
         }
-        #endregion
+
+        #endregion Serial IO
 
         #region Initialization
+
         private void Reset(int RSTPin)
         {
             if (-1 == RSTPin)
@@ -571,14 +602,13 @@ namespace AdafruitClassLibrary
 
             if (Connected)
             {
-
                 SetMode(OperationMode.OPERATION_MODE_CONFIG);    //go into config mode
                 WriteRegister(BNO055_PAGE_ID_ADDR, 0/*, false*/); //set to page 0
 
                 byte chipID = ReadRegister(BNO055_CHIP_ID_ADDR);
 
                 if (BNO055_ID == chipID)
-                {                    
+                {
                     Reset(RSTPin);
 
                     WriteRegister(BNO055_PWR_MODE_ADDR, POWER_MODE_NORMAL); //set power mode normal
@@ -589,9 +619,11 @@ namespace AdafruitClassLibrary
                 }
             }
         }
-        #endregion
+
+        #endregion Initialization
 
         #region Operations
+
         public Revisions GetRevision()
         {
             Revisions revisionData = new Revisions();
@@ -694,11 +726,11 @@ namespace AdafruitClassLibrary
 
             map.Z = (byte)((mapConfig >> 4) & 0x03);
             map.Y = (byte)((mapConfig >> 2) & 0x03);
-            map.X = (byte) (mapConfig & 0x03);
+            map.X = (byte)(mapConfig & 0x03);
 
             map.ZSign = (byte)((signConfig >> 2) & 0x01);
             map.YSign = (byte)((signConfig >> 1) & 0x01);
-            map.XSign = (byte) (signConfig & 0x01);
+            map.XSign = (byte)(signConfig & 0x01);
 
             return map;
         }
@@ -710,11 +742,11 @@ namespace AdafruitClassLibrary
 
             mapConfig |= (byte)((map.Z & 0x03) << 4);
             mapConfig |= (byte)((map.Y & 0x03) << 2);
-            mapConfig |= (byte) (map.X & 0x03);
+            mapConfig |= (byte)(map.X & 0x03);
 
             signConfig |= (byte)((map.ZSign & 0x01) << 2);
             signConfig |= (byte)((map.YSign & 0x01) << 1);
-            signConfig |= (byte) (map.XSign & 0x01);
+            signConfig |= (byte)(map.XSign & 0x01);
 
             SetMode(OperationMode.OPERATION_MODE_CONFIG);
             WriteRegister(BNO055_AXIS_MAP_CONFIG_ADDR, mapConfig);
@@ -834,6 +866,7 @@ namespace AdafruitClassLibrary
             else
                 return temp;
         }
-        #endregion
+
+        #endregion Operations
     }
 }

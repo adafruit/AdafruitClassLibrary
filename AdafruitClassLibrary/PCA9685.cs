@@ -18,52 +18,51 @@
   ------------------------------------------------------------------------*/
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Windows.Devices.Enumeration;
-using Windows.Devices.I2c;
 
 namespace AdafruitClassLibrary
 {
-    public class PCA9685 : I2CBase
+    public class Pca9685 : I2CBase
     {
         #region Constants
-        const byte PCA9685_ADDRESS = 0x40;
-        const byte PCA9685_MODE1 = 0x00;
-        const byte PCA9685_MODE2 = 0x01;
-        const byte PCA9685_SUBADR1 = 0x02;
-        const byte PCA9685_SUBADR2 = 0x03;
-        const byte PCA9685_SUBADR3 = 0x04;
-        const byte PCA9685_PRESCALE = 0xFE;
-        const byte LED0_ON_L = 0x06;
-        const byte LED0_ON_H = 0x07;
-        const byte LED0_OFF_L = 0x08;
-        const byte LED0_OFF_H = 0x09;
-        const byte ALL_LED_ON_L = 0xFA;
-        const byte ALL_LED_ON_H = 0xFB;
-        const byte ALL_LED_OFF_L = 0xFC;
-        const byte ALL_LED_OFF_H = 0xFD;
+
+        private const byte PCA9685_ADDRESS = 0x40;
+        private const byte PCA9685_MODE1 = 0x00;
+        private const byte PCA9685_MODE2 = 0x01;
+        private const byte PCA9685_SUBADR1 = 0x02;
+        private const byte PCA9685_SUBADR2 = 0x03;
+        private const byte PCA9685_SUBADR3 = 0x04;
+        private const byte PCA9685_PRESCALE = 0xFE;
+        private const byte LED0_ON_L = 0x06;
+        private const byte LED0_ON_H = 0x07;
+        private const byte LED0_OFF_L = 0x08;
+        private const byte LED0_OFF_H = 0x09;
+        private const byte ALL_LED_ON_L = 0xFA;
+        private const byte ALL_LED_ON_H = 0xFB;
+        private const byte ALL_LED_OFF_L = 0xFC;
+        private const byte ALL_LED_OFF_H = 0xFD;
 
         // Bits:
-        const byte RESTART = 0x80;
-        const byte SLEEP = 0x10;
-        const byte ALLCALL = 0x01;
-        const byte INVRT = 0x10;
-        const byte OUTDRV = 0x04;
+        private const byte RESTART = 0x80;
 
-        #endregion
+        private const byte SLEEP = 0x10;
+        private const byte ALLCALL = 0x01;
+        private const byte INVRT = 0x10;
+        private const byte OUTDRV = 0x04;
 
+        #endregion Constants
 
         #region Constructor
-        public PCA9685(int addr = PCA9685_ADDRESS) : base (addr)
+
+        public Pca9685(int addr = PCA9685_ADDRESS) : base(addr)
         {
         }
-        #endregion
+
+        #endregion Constructor
 
         #region Initialization
+
         /// <summary>
         /// InitPCA9685Async
         /// Initialize PCA9685 chip
@@ -82,7 +81,6 @@ namespace AdafruitClassLibrary
                 System.Diagnostics.Debug.WriteLine("Exception: {0}", e.Message);
                 return;
             }
-
         }
 
         /// <summary>
@@ -98,9 +96,11 @@ namespace AdafruitClassLibrary
             Write(writeBuffer);
             SetPWMFrequency(1000);  //default frequency
         }
-        #endregion
+
+        #endregion Initialization
 
         #region Operations
+
         public void SetPWMFrequency(double freq)
         {
             byte[] readBuffer;
@@ -210,7 +210,8 @@ namespace AdafruitClassLibrary
                 }
             }
         }
-        #endregion
+
+        #endregion Operations
 
         /// <summary>
         /// usDelay
@@ -227,7 +228,6 @@ namespace AdafruitClassLibrary
 
             while (sw.ElapsedTicks < durationTicks)
             {
-
             }
         }
     }

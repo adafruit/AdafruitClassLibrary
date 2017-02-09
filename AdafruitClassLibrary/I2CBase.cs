@@ -18,9 +18,6 @@
   ------------------------------------------------------------------------*/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Windows.Devices.Enumeration;
 using Windows.Devices.I2c;
@@ -32,18 +29,23 @@ namespace AdafruitClassLibrary
         public enum I2CSpeed { I2C_100kHz, I2C_400kHz };
 
         #region Properties
+
         private int I2CAddr { get; set; }
         protected I2cDevice Device { get; set; }
-        #endregion
+
+        #endregion Properties
 
         #region Constructor
+
         protected I2CBase(int addr)
         {
             I2CAddr = addr;
         }
-        #endregion
+
+        #endregion Constructor
 
         #region Initialization
+
         /// <summary>
         /// InitI2C
         /// Initialize I2C Communications
@@ -70,9 +72,11 @@ namespace AdafruitClassLibrary
                 return;
             }
         }
-        #endregion
+
+        #endregion Initialization
 
         #region I2C primitives
+
         /// <summary>
         /// WriteRead
         /// writes to I2C and reads back the result
@@ -133,7 +137,7 @@ namespace AdafruitClassLibrary
                 System.Diagnostics.Debug.WriteLine("I2C Write Exception: {0}", ex.Message);
             }
         }
-        #endregion
 
+        #endregion I2C primitives
     }
 }

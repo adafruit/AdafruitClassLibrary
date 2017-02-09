@@ -17,15 +17,11 @@
   MIT license, all text above must be included in any redistribution.
   ------------------------------------------------------------------------*/
 
-
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Windows.Devices.Enumeration;
-using Windows.Devices.Spi;
 using Windows.Devices.Gpio;
+using Windows.Devices.Spi;
 
 namespace AdafruitClassLibrary
 {
@@ -59,7 +55,8 @@ namespace AdafruitClassLibrary
         // here may (intentionally) roll over...so 0 = max brightness (color
         // values are interpreted literally; no scaling), 1 = min brightness
         // (off), 255 = just below max brightness.
-        byte m_Brightness = 255;
+        private byte m_Brightness = 255;
+
         public byte Brightness
         {
             get
@@ -111,8 +108,8 @@ namespace AdafruitClassLibrary
             ScopeTriggerEnd();
         }
 
-
         #region Software Spi
+
         private void sw_spi_init()
         {
             var gpio = GpioController.GetDefault();
@@ -149,15 +146,16 @@ namespace AdafruitClassLibrary
                 sw_spi_out(p);
         }
 
-
         private void sw_spi_end()
         { // Stop 'soft' SPI
             SWSpiDataPin.SetDriveMode(GpioPinDriveMode.Input);
             SWSpiClockPin.SetDriveMode(GpioPinDriveMode.Input);
         }
-        #endregion
+
+        #endregion Software Spi
 
         #region Hardware Spi
+
         private async Task hw_spi_initAsync()
         {
             // Get a selector string for bus "SPI0"
@@ -190,9 +188,11 @@ namespace AdafruitClassLibrary
         {
             HWSpiDevice.Dispose();
         }
-        #endregion
+
+        #endregion Hardware Spi
 
         #region DotStarOptimized functions
+
         public void UpdateLength(uint numPixels)
         {
             NumPixels = numPixels;
@@ -281,7 +281,7 @@ namespace AdafruitClassLibrary
                     }
                     else
                     {                             // Full brightness (no scaling)
-                                                    //  TriggerScopePin(true);
+                                                  //  TriggerScopePin(true);
                         hw_spi_out(Pixels);
                         //  TriggerScopePin(false);
                     }
@@ -294,7 +294,6 @@ namespace AdafruitClassLibrary
 
                     hw_spi_out(m_endFrame); // End-frame marker (see note above)
                 }
-
                 else //sw spi
                 {
                     sw_spi_out(m_startFrame);    // Start-frame marker
@@ -323,9 +322,11 @@ namespace AdafruitClassLibrary
 
             TriggerScopePin(false);
         }
-        #endregion
+
+        #endregion DotStarOptimized functions
 
         #region debugging
+
         private GpioPin ScopePin { get; set; }
 
         private void ScopeTriggerInit(int scopePin)
@@ -355,7 +356,7 @@ namespace AdafruitClassLibrary
             else
                 ScopePin.Write(GpioPinValue.Low);
         }
-        #endregion
+
+        #endregion debugging
     }
 }
-
