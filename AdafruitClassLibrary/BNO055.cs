@@ -791,9 +791,9 @@ namespace AdafruitClassLibrary
             List<short> vector = ReadVector(BNO055_GYRO_DATA_X_LSB_ADDR);
             if (3 == vector.Count())
             {
-                gyro.X = vector[0] / 900.0;
-                gyro.Y = vector[1] / 900.0;
-                gyro.Z = vector[2] / 900.0;
+                gyro.X = vector[0] / 16.0;
+                gyro.Y = vector[1] / 16.0;
+                gyro.Z = vector[2] / 16.0;
             }
             return gyro;
         }
