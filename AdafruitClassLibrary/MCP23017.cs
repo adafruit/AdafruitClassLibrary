@@ -94,29 +94,59 @@ namespace AdafruitClassLibrary
             Write(writeBuffer);
         }
 
-        public void EnableInterrupts()
+        #endregion Initialization
+
+        #region Interrupts
+
+        /// <summary>
+        /// Enables the interrupts for pin p.
+        /// </summary>
+        /// <param name="p">Pin id (0..15).</param>
+        public void EnableInterrupts(int p)
         {
+            byte gppuAddr, gppu, gpintenAddr, gpinten;
 
-            byte[] ReadBuffer = new byte[1];
+            // only 16 bits!
+            if (p > 15)
+                return;
+            if (p < 8)
+            {
+                gppuAddr = MCP23017_GPPUA;
+                gpintenAddr = MCP23017_GPINTENA;
+            }
+            else
+            {
+                gppuAddr = MCP23017_GPPUB;
+                gpintenAddr = MCP23017_GPINTENB;
+                p -= 8;
+            }
 
-            // Read the current IOCONA values
-            WriteRead(new byte[] { 0x0A }, ReadBuffer); // 0x0A IOCONA
-            byte NewValues = ReadBuffer[0];
+            byte[] readBuffer = new byte[1];
 
-            // Toggle bit 6 to 1 in the existing byte to enable interrupt mirroring
-            NewValues |= (byte)(1 << 6);
+            // Enable pull-up resistor for pin p
+            WriteRead(new byte[] { gppuAddr }, readBuffer);
+            gppu = readBuffer[0];
+            gppu |= (byte)(1 << p);
+            Write(new byte[] { gppuAddr, gppu });
 
-            // Write the updated byte to the IOCONA register
-            Write(new byte[] { 0x0A, NewValues }); // 0x0A IOCONA - bit 6 on
-
-            // Enable pull-up resistor for GPB0
-            Write(new byte[] { 0x0D, 0x08 }); // 0x0D GPPUBB, 00000001 - GPB0
-
-            // Enable interrup on GPB0
-            Write(new byte[] { 0x05, 0x08 }); // 0x05 GPINTENB, 00000001 - GPB0
+            // Enable interrup on pin p
+            WriteRead(new byte[] { gpintenAddr }, readBuffer);
+            gpinten = readBuffer[0];
+            gpinten |= (byte)(1 << p);
+            Write(new byte[] { gpintenAddr, gpinten });
         }
 
-        #endregion Initialization
+        //public void EnableInterruptMirroring()
+        //{
+        //    byte[] ReadBuffer = new byte[1];
+
+        //    WriteRead(new byte[] { MCP23017_IOCONA }, ReadBuffer); // 0x0A IOCONA
+        //    byte NewValues = ReadBuffer[0];
+        //    NewValues |= (byte)(1 << 6);
+        //    Write(new byte[] { MCP23017_IOCONA, NewValues });
+        //}
+
+        #endregion
 
         #region Operations
 
