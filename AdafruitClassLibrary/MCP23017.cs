@@ -96,6 +96,62 @@ namespace AdafruitClassLibrary
 
         #endregion Initialization
 
+        #region Interrupts
+
+        /// <summary>
+        /// Enables the interrupts for pin p.
+        /// </summary>
+        /// <param name="p">Pin id (0..15).</param>
+        public void EnableInterrupts(int p)
+        {
+            byte gppuAddr, gppu, gpintenAddr, gpinten;
+
+            // only 16 bits!
+            if (p > 15)
+                return;
+            if (p < 8)
+            {
+                gppuAddr = MCP23017_GPPUA;
+                gpintenAddr = MCP23017_GPINTENA;
+            }
+            else
+            {
+                gppuAddr = MCP23017_GPPUB;
+                gpintenAddr = MCP23017_GPINTENB;
+                p -= 8;
+            }
+
+            byte[] readBuffer = new byte[1];
+
+            // Enable pull-up resistor for pin p
+            WriteRead(new byte[] { gppuAddr }, readBuffer);
+            gppu = readBuffer[0];
+            gppu |= (byte)(1 << p);
+            Write(new byte[] { gppuAddr, gppu });
+
+            // Enable interrup on pin p
+            WriteRead(new byte[] { gpintenAddr }, readBuffer);
+            gpinten = readBuffer[0];
+            gpinten |= (byte)(1 << p);
+            Write(new byte[] { gpintenAddr, gpinten });
+        }
+
+        /// <summary>
+        /// Enables interrupts mirroring.
+        /// Signalises both INTA and INTB on input change.
+        /// </summary>
+        public void EnableInterruptsMirroring()
+        {
+            byte[] ReadBuffer = new byte[1];
+
+            WriteRead(new byte[] { MCP23017_IOCONA }, ReadBuffer); // 0x0A IOCONA
+            byte NewValues = ReadBuffer[0];
+            NewValues |= (byte)(1 << 6);
+            Write(new byte[] { MCP23017_IOCONA, NewValues });
+        }
+
+        #endregion
+
         #region Operations
 
         /// <summary>
