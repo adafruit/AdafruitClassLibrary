@@ -136,15 +136,19 @@ namespace AdafruitClassLibrary
             Write(new byte[] { gpintenAddr, gpinten });
         }
 
-        //public void EnableInterruptMirroring()
-        //{
-        //    byte[] ReadBuffer = new byte[1];
+        /// <summary>
+        /// Enables interrupts mirroring.
+        /// Signalises both INTA and INTB on input change.
+        /// </summary>
+        public void EnableInterruptsMirroring()
+        {
+            byte[] ReadBuffer = new byte[1];
 
-        //    WriteRead(new byte[] { MCP23017_IOCONA }, ReadBuffer); // 0x0A IOCONA
-        //    byte NewValues = ReadBuffer[0];
-        //    NewValues |= (byte)(1 << 6);
-        //    Write(new byte[] { MCP23017_IOCONA, NewValues });
-        //}
+            WriteRead(new byte[] { MCP23017_IOCONA }, ReadBuffer); // 0x0A IOCONA
+            byte NewValues = ReadBuffer[0];
+            NewValues |= (byte)(1 << 6);
+            Write(new byte[] { MCP23017_IOCONA, NewValues });
+        }
 
         #endregion
 
