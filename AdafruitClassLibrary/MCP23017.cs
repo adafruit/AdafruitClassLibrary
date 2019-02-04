@@ -94,6 +94,28 @@ namespace AdafruitClassLibrary
             Write(writeBuffer);
         }
 
+        public void EnableInterrupts()
+        {
+
+            byte[] ReadBuffer = new byte[1];
+
+            // Read the current IOCONA values
+            WriteRead(new byte[] { 0x0A }, ReadBuffer); // 0x0A IOCONA
+            byte NewValues = ReadBuffer[0];
+
+            // Toggle bit 6 to 1 in the existing byte to enable interrupt mirroring
+            NewValues |= (byte)(1 << 6);
+
+            // Write the updated byte to the IOCONA register
+            Write(new byte[] { 0x0A, NewValues }); // 0x0A IOCONA - bit 6 on
+
+            // Enable pull-up resistor for GPB0
+            Write(new byte[] { 0x0D, 0x08 }); // 0x0D GPPUBB, 00000001 - GPB0
+
+            // Enable interrup on GPB0
+            Write(new byte[] { 0x05, 0x08 }); // 0x05 GPINTENB, 00000001 - GPB0
+        }
+
         #endregion Initialization
 
         #region Operations
