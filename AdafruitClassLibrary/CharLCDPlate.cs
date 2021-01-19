@@ -7,14 +7,6 @@
   please support Adafruit and open-source hardware by purchasing products
   from Adafruit!
 
-  ------------------------------------------------------------------------
-  This file is part of the Adafruit Windows IoT Class Library
-
-  Adafruit CharLCDPlate is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-
-  MIT license, all text above must be included in any redistribution.
   ------------------------------------------------------------------------*/
 
 using System;
